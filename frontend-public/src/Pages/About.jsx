@@ -4,7 +4,7 @@ export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white text-gray-800">
       
-      {/* Hero Section */}
+
       <section className="text-center py-16 bg-gradient-to-r from-green-100 to-blue-100 shadow-sm">
         <h1 className="text-4xl font-bold mb-3 text-green-800">Бидний тухай</h1>
         <p className="text-lg text-gray-700 max-w-2xl mx-auto">
@@ -13,7 +13,7 @@ export default function About() {
         </p>
       </section>
 
-      {/* 1. Манай тухай */}
+
       <section className="max-w-6xl mx-auto py-16 px-6 flex flex-col md:flex-row items-center gap-10">
         <img
           src="https://images.unsplash.com/photo-1506744038136-46273834b3fb"
@@ -30,7 +30,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* 2. Манай үйлчилгээ */}
+ 
       <section className="bg-green-50 py-16">
         <div className="max-w-6xl mx-auto text-center px-6">
           <h2 className="text-3xl font-semibold text-green-700 mb-8">✨ Манай үйлчилгээ</h2>
@@ -75,7 +75,7 @@ export default function About() {
         </div>
       </section>
 
-      {/* 3. Манай зорилго */}
+
       <section className="max-w-6xl mx-auto py-16 px-6 text-center">
         <h2 className="text-3xl font-semibold text-green-700 mb-4">🎯 Манай зорилго</h2>
         <p className="max-w-3xl mx-auto text-gray-700 leading-relaxed">
