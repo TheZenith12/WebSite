@@ -1,10 +1,12 @@
-import React from 'react'
-import { Navigate } from 'react-router-dom'
-import auth from '../utils/auth'
+// src/components/ProtectedRoute.jsx
+import { Navigate } from "react-router-dom";
 
-function RequireAuth({ children }) {
-  if (!auth.isLoggedIn()) return <Navigate to="/login" replace />
-  return children
-}
+const RequireAuth = ({ children }) => {
+  const token = localStorage.getItem("admin_token"); // зөв нэр
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+  return children;
+};
 
-export default RequireAuth
+export default RequireAuth;

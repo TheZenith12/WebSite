@@ -19,7 +19,10 @@ function Login() {
       const res = await fetch(`${API_BASE}/api/admin/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({
+  email: email,
+  password: password
+})
       });
 
       // Серверээс хариу шалгах
@@ -33,11 +36,10 @@ function Login() {
 
       // Токен хадгалах
       auth.login(data.token);
-
-      // Нүүр хуудас руу чиглүүлэх
-      navigate("/resorts");
+  
+      navigate("/resorts");   // dashboard руу чиглүүлэх
     } catch (err) {
-      console.error("Login error:", err);
+      console.error(err);
       setError("Server connection failed");
     } finally {
       setLoading(false);

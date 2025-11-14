@@ -1,8 +1,11 @@
+// utils/auth.js
+const TOKEN_KEY = "admin_token";
+
 const auth = {
-  login: (token) => localStorage.setItem("admin_token", token),
-  logout: () => localStorage.removeItem("admin_token"),
-  isLoggedIn: () => !!localStorage.getItem("admin_token"),
-  getToken: () => localStorage.getItem("admin_token"),
+  login: (token) => localStorage.setItem(TOKEN_KEY, token),
+  logout: () => localStorage.removeItem(TOKEN_KEY),
+  isLoggedIn: () => !!localStorage.getItem(TOKEN_KEY),
+  getToken: () => localStorage.getItem(TOKEN_KEY)
 };
 
 export default auth;

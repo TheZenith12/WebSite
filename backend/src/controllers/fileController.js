@@ -1,8 +1,14 @@
+import { v2 as cloudinary } from "cloudinary";
 import File from "../models/fileModel.js";
 import Resort from "../models/resortModel.js";
 import path from "path";
 import fs from "fs";
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
+});
 
 export const getFiles = async (req, res) => {
   try {
@@ -38,8 +44,15 @@ export const uploadFile = async (req, res) => {
     }
 
 
-    const fileUrl = `/uploads/resorts/${file.filename}`;
-
+    const uploadResult = await cloudinary.uploader.upload_stream(
+      {
+        folder: "resorts"
+      },
+      async (error, result) => {
+        if (error) {
+          console.error("Cloudinary upload error:", error);
+          return res.status(500).json({ message: "Upload амжилтгүй" });
+        }
 
     const newFile = new File({
       resortsId: resortId,
@@ -60,6 +73,11 @@ export const uploadFile = async (req, res) => {
       message: "Файл амжилттай хадгалагдлаа",
       file: newFile,
     });
+  }
+    );
+
+    uploadResult.end(file.buffer);
+
   } catch (err) {
     console.error("Upload file error:", err);
     res.status(500).json({ message: err.message });

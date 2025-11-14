@@ -1,298 +1,252 @@
 import mongoose from "mongoose";
 import Resort from "../models/resortModel.js";
 import File from "../models/fileModel.js";
+import { v2 as cloudinary } from "cloudinary";
 import path from "path";
 import fs from "fs";
-import { v4 as uuidv4 } from "uuid";
+
 
 // ============================================
-// ✅ Админаас зөвхөн list харж байгаа нь шүү
+// GET ALL RESORTS (ADMIN LIST)
 // ============================================
-
 export const getResorts = async (req, res) => {
   try {
     const resorts = await Resort.aggregate([
       {
         $lookup: {
-          from: "files",           // File collection
-          localField: "_id",       // Resort._id
-          foreignField: "resortsId", // File.resortsId
-          as: "files"
-        }
+          from: "files",
+          localField: "_id",
+          foreignField: "resortsId",
+          as: "files",
+        },
       },
       {
         $addFields: {
-          image: { 
-            $arrayElemAt: [ "$files.images", 0 ] // эхний зураг л авна
-          }
-        }
+          image: { $arrayElemAt: ["$files.images.url", 0] },
+        },
       },
       {
-        $project: {
-          files: 0, // files array-г нуух
-          __v: 0
-        }
+        $project: { files: 0, __v: 0 },
       },
-      { $sort: { createdAt: -1 } }
+      { $sort: { createdAt: -1 } },
     ]);
 
-    res.status(200).json({
-      success: true,
-      count: resorts.length,
-      resorts
-    });
+    res.status(200).json({ success: true, resorts });
   } catch (err) {
-    console.error("❌ getResorts алдаа:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
 
-
-
 // ============================================
-// ✅ GET resort by ID
+// GET RESORT BY ID
 // ============================================
 export const getResortById = async (req, res) => {
   try {
     const resort = await Resort.findById(req.params.id);
     if (!resort) return res.status(404).json({ message: "Resort олдсонгүй" });
 
-    // Resort-д холбогдсон файлуудыг авчрах
     const files = await File.find({ resortsId: resort._id });
 
     res.json({ resort, files });
   } catch (err) {
-    console.error("❌ getResortById алдаа:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-// ============================================
-// ✅ CREATE new resort
-// ============================================
 
+// ============================================
+// CREATE RESORT + CLOUDINARY FILES
+// ============================================
 export const createResort = async (req, res) => {
   try {
     const { name, description, price, location } = req.body;
-    console.log("create begin");
 
-    // 1️⃣ Resort үүсгэх
-    const newResort = new Resort({
+    const newResort = await Resort.create({
       name,
       description,
       price,
       location,
     });
 
-    const savedResort = await newResort.save();
+    let images = [];
+    let videos = [];
 
-    // --- newFile-ийг гадна зарлах ---
-    let newFile;
+    // Upload images
+    if (req.files?.images) {
+      for (const file of req.files.images) {
+        const uploaded = await cloudinary.uploader.upload(file.path, {
+          folder: "amaralt/resorts/images",
+        });
+        images.push({
+          url: uploaded.secure_url,
+          public_id: uploaded.public_id,
+        });
+      }
+    }
 
-    // 2️⃣ Файлууд хадгалах
-    if (req.files && (req.files.images || req.files.videos)) {
-      const images =
-        req.files.images?.map((f) => `/uploads/resorts/${f.filename}`) || [];
+    // Upload videos
+    if (req.files?.videos) {
+      for (const file of req.files.videos) {
+        const uploaded = await cloudinary.uploader.upload(file.path, {
+          folder: "amaralt/resorts/videos",
+          resource_type: "video",
+        });
+        videos.push({
+          url: uploaded.secure_url,
+          public_id: uploaded.public_id,
+        });
+      }
+    }
 
-      const videos =
-        req.files.videos?.map((f) => `/uploads/resorts/${f.filename}`) || [];
-
-      newFile = new File({
-        resortsId: savedResort._id,
+    // Save to File collection
+    if (images.length > 0 || videos.length > 0) {
+      await File.create({
+        resortsId: newResort._id,
         images,
         videos,
       });
-
-      await newFile.save();
     }
 
     res.status(201).json({
       success: true,
       message: "🏕️ Resort амжилттай нэмэгдлээ",
-      resort: savedResort,
+      resort: newResort,
     });
   } catch (error) {
-    console.error("❌ Resort үүсгэхэд алдаа:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
 
-//  UPDATE resort 
+// ============================================
+// UPDATE RESORT (Cloudinary delete + add)
+// ============================================
 export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, location, removedImages, removedVideos } = req.body;
 
-    // 🧩 JSON string-үүдийг parse хийх
-    const parsedRemovedImages = removedImages ? JSON.parse(removedImages) : [];
-    const parsedRemovedVideos = removedVideos ? JSON.parse(removedVideos) : [];
+    const removedImg = removedImages ? JSON.parse(removedImages) : [];
+    const removedVid = removedVideos ? JSON.parse(removedVideos) : [];
 
-    // 🧩 Resort олох
     const resort = await Resort.findById(id);
-    if (!resort) {
-      return res.status(404).json({ message: "Resort олдсонгүй" });
-    }
+    if (!resort) return res.status(404).json({ message: "Resort олдсонгүй" });
 
-    // 🧩 Resort үндсэн мэдээлэл шинэчлэх
+    // Update base info
     resort.name = name || resort.name;
     resort.description = description || resort.description;
     resort.price = price || resort.price;
     resort.location = location || resort.location;
     await resort.save();
 
-    // =============================
-    // 🗑️ Устгасан зураг, бичлэгийг устгах
-    // =============================
+    // Delete removed images (Cloudinary)
+    for (const img of removedImg) {
+      if (img.public_id) await cloudinary.uploader.destroy(img.public_id);
+    }
 
-    // 📸 Зураг устгах
-    for (const imgPath of parsedRemovedImages) {
-      const fullPath = path.join(process.cwd(), "public", imgPath.replace(/^\/+/, ""));
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
-        console.log("🧹 Deleted image:", fullPath);
+    // Delete removed videos
+    for (const vid of removedVid) {
+      if (vid.public_id) {
+        await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
       }
     }
 
-    // 🎥 Видео устгах
-    for (const vidPath of parsedRemovedVideos) {
-      const fullPath = path.join(process.cwd(), "public", vidPath.replace(/^\/+/, ""));
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
-        console.log("🧹 Deleted video:", fullPath);
+    // Remove from DB
+    await File.updateMany(
+      { resortsId: id },
+      { 
+        $pull: { 
+          images: { public_id: { $in: removedImg.map(i => i.public_id) } },
+          videos: { public_id: { $in: removedVid.map(v => v.public_id) } },
+        }
       }
-    }
+    );
 
-    // =============================
-    // 🧩 DB доторх images/videos array-с устгах
-    // =============================
-    if (parsedRemovedImages.length > 0) {
-      await File.updateMany(
-        { resortsId: id },
-        { $pull: { images: { $in: parsedRemovedImages } } }
-      );
-    }
-
-    if (parsedRemovedVideos.length > 0) {
-      await File.updateMany(
-        { resortsId: id },
-        { $pull: { videos: { $in: parsedRemovedVideos } } }
-      );
-    }
-
-    // =============================
-    // 🧩 Шинэ зураг болон бичлэг нэмэх
-    // =============================
-    console.log("req.files:", req.files);
-
-    // --- шинэ зураг ---
-    if (req.files && req.files.images) {
-      const images =
-        req.files.images.map((f) => `/uploads/resorts/${f.filename}`) || [];
-      console.log("📸 New images:", images);
+    // UPLOAD NEW IMAGES
+    if (req.files?.images) {
+      const uploadedImages = [];
+      for (const file of req.files.images) {
+        const upload = await cloudinary.uploader.upload(file.path, {
+          folder: "amaralt/resorts/images",
+        });
+        uploadedImages.push({
+          url: upload.secure_url,
+          public_id: upload.public_id,
+        });
+      }
 
       await File.updateOne(
-        { resortsId: resort._id },
-        { $push: { images: { $each: images } } },
-        { upsert: true } // File бичлэг байхгүй бол үүсгэнэ
-      );
-    }
-
-    // --- шинэ бичлэг ---
-    if (req.files && req.files.videos) {
-      const videos =
-        req.files.videos.map((f) => `/uploads/resorts/${f.filename}`) || [];
-      console.log("🎥 New videos:", videos);
-
-      await File.updateOne(
-        { resortsId: resort._id },
-        { $push: { videos: { $each: videos } } },
+        { resortsId: id },
+        { $push: { images: { $each: uploadedImages } } },
         { upsert: true }
       );
     }
 
-    // =============================
-    // 🧹 Хоосон file бичлэг устгах
-    // =============================
-    await File.deleteMany({
-      resortsId: id,
-      $and: [
-        { images: { $size: 0 } },
-        { videos: { $size: 0 } },
-      ],
-    });
+    // UPLOAD NEW VIDEOS
+    if (req.files?.videos) {
+      const uploadedVideos = [];
+      for (const file of req.files.videos) {
+        const upload = await cloudinary.uploader.upload(file.path, {
+          folder: "amaralt/resorts/videos",
+          resource_type: "video",
+        });
+        uploadedVideos.push({
+          url: upload.secure_url,
+          public_id: upload.public_id,
+        });
+      }
 
-    // =============================
-    // ✅ Амжилттай хариу буцаах
-    // =============================
-    const files = await File.find({ resortsId: resort._id });
+      await File.updateOne(
+        { resortsId: id },
+        { $push: { videos: { $each: uploadedVideos } } },
+        { upsert: true }
+      );
+    }
+
+    const files = await File.find({ resortsId: id });
+
     res.json({
       success: true,
-      message: "✅ Resort зураг болон бичлэг амжилттай шинэчлэгдлээ!",
+      message: "Resort амжилттай шинэчлэгдлээ!",
       resort,
       files,
     });
 
   } catch (err) {
-    console.error("❌ Resort шинэчлэхэд алдаа:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
 
 // ============================================
-// ✅ DELETE Resort + related files
+// DELETE RESORT + CLOUDINARY FILES
 // ============================================
 export const deleteResort = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1️⃣ Resort байгаа эсэхийг шалгах
     const resort = await Resort.findById(id);
-    if (!resort) {
-      return res.status(404).json({ success: false, message: "Resort олдсонгүй" });
-    }
+    if (!resort) return res.status(404).json({ message: "Resort олдсонгүй" });
 
-    // 2️⃣ Холбогдсон File бичлэгүүдийг олох
     const files = await File.find({ resortsId: id });
 
-    // 3️⃣ File бүрийн images болон videos устгах
+    // Delete cloudinary images/videos
     for (const file of files) {
-      if (file.images && file.images.length > 0) {
-        for (const imgPath of file.images) {
-          const fullPath = path.join(process.cwd(), "public", imgPath);
-          if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
-            console.log("🗑️ Устгасан зураг:", imgPath);
-          }
-        }
+      for (const img of file.images) {
+        await cloudinary.uploader.destroy(img.public_id);
       }
-
-      if (file.videos && file.videos.length > 0) {
-        for (const vidPath of file.videos) {
-          const fullPath = path.join(process.cwd(), "public", vidPath);
-          if (fs.existsSync(fullPath)) {
-            fs.unlinkSync(fullPath);
-            console.log("🗑️ Устгасан бичлэг:", vidPath);
-          }
-        }
+      for (const vid of file.videos) {
+        await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
       }
     }
 
-    // 4️⃣ File бичлэгүүдийг DB-ээс устгах
     await File.deleteMany({ resortsId: id });
-    console.log("🧹 File хүснэгтээс холбогдсон бичлэгүүдийг устгалаа");
-
-    // 5️⃣ Resort-г устгах
     await Resort.findByIdAndDelete(id);
 
-    res.json({
-      success: true,
-      message: "🏕️ Resort болон холбогдсон файлууд амжилттай устлаа",
-    });
+    res.json({ success: true, message: "Resort устгагдлаа" });
+
   } catch (err) {
-    console.error("❌ Resort устгахад алдаа:", err);
-    res.status(500).json({ success: false, message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
