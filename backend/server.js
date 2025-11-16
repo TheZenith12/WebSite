@@ -13,9 +13,14 @@ dotenv.config();
 
 const app = express();
 
-// Middleware
-app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// Middleware
+app.use(cors({
+  origin: ["http://localhost:5173", "http://localhost:5174"],
+  credentials: true
+}));
 
 
 connectDB();
@@ -35,6 +40,9 @@ app.use((err, req, res, next) => {
 app.get('/', (req, res) => {
   res.send('Backend server is running on Vercel + Cloudinary!');
 });
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
 // Export as serverless function for Vercel
 export default app;

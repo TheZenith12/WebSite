@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import auth from "../utils/auth";
-import { API_BASE } from "../global";
+
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function Login() {
   const navigate = useNavigate();

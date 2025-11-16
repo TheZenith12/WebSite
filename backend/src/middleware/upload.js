@@ -1,28 +1,23 @@
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import cloudinary from "../utils/cloudinary.js";
 
-// Cloudinary тохиргоо
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-// Vercel-д зөв ажиллах storage
 const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
+  cloudinary,
   params: async (req, file) => {
-    let folder = "resorts";
-    if (file.mimetype.startsWith("video")) folder = "resorts/videos";
+    const isVideo = file.mimetype.startsWith("video/");
     return {
-      folder,
-      resource_type: file.mimetype.startsWith("video") ? "video" : "image",
+      folder: isVideo ? "resorts/videos" : "resorts/images",
+      resource_type: isVideo ? "video" : "image",
+      allowed_formats: ["jpg","jpeg","png","webp","mp4","mov"],
       public_id: `${Date.now()}-${file.originalname.split(".")[0]}`,
     };
   },
 });
 
-// Multer upload middleware
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: 500 * 1024 * 1024 }, // 500MB хэрэв хэрэгтэй бол
+});
 
 export default upload;

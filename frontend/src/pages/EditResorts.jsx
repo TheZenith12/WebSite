@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
-import { API_BASE } from "../global";
+
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function EditResort() {
   const { id } = useParams();
@@ -130,7 +131,7 @@ const handleSubmit = async (e) => {
   formData.append("removedVideos", JSON.stringify(removedVideos));
 
   try {
-    await axios.put(`${API_BASE}/api/admin/resorts/${id}`, formData, {
+    await axios.put(`${API_BASE}/api/admin/resorts/edit/${id}`, formData, {
       headers: { "Content-Type": "multipart/form-data" },
     });
     alert("✅ Амжилттай шинэчлэгдлээ!");
@@ -168,7 +169,7 @@ const handleSubmit = async (e) => {
           <div className="flex flex-wrap gap-2">
             {existingImages.map((img, i) => (
               <div key={i} className="relative">
-                <img src={`${API_BASE}${img}`} alt="" className="w-24 h-24 object-cover rounded" />
+                <img src={img} alt="" className="w-24 h-24 object-cover rounded" />
                 <button type="button" onClick={() => removeExistingImage(i)} className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded">✕</button>
               </div>
             ))}
@@ -195,7 +196,7 @@ const handleSubmit = async (e) => {
           <div className="flex flex-wrap gap-2">
             {existingVideos.map((vid, i) => (
               <div key={i} className="relative">
-                <video width="120" height="90" controls src={`${API_BASE}${vid}`} className="rounded" />
+                <video width="120" height="90" controls src={vid} className="rounded" />
                 <button type="button" onClick={() => removeExistingVideo(i)} className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded">✕</button>
               </div>
             ))}

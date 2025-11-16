@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { API_BASE } from "../global";
+
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function Resorts() {
   const [list, setList] = useState([]);
@@ -65,7 +66,7 @@ function Resorts() {
           >
             <div className="flex gap-4">
               <img
-                src={r.image && r.image.length > 0 ? `${API_BASE}${r.image[0]}` : "/placeholder.jpg"}
+                src={r.image && r.image.length > 0 ? r.image[0] : "/placeholder.jpg"}
                 //src={`${API_BASE.replace(/\/$/, "")}${r.image[0]}`}    
                 alt={r.name}
                 className="w-28 h-20 rounded object-cover"

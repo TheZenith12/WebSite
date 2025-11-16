@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { API_BASE } from "../global";
+
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function AddResort() {
   const [form, setForm] = useState({

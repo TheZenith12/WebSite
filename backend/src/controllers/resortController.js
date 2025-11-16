@@ -1,13 +1,25 @@
 import mongoose from "mongoose";
 import Resort from "../models/resortModel.js";
 import File from "../models/fileModel.js";
-import { v2 as cloudinary } from "cloudinary";
 import path from "path";
 import fs from "fs";
-
+import { v4 as uuidv4 } from "uuid";
+import cloudinary from "../utils/cloudinary.js";
 
 // ============================================
-// GET ALL RESORTS (ADMIN LIST)
+// 🧩 Cloudinary URL-аас public_id гаргах функц
+// ============================================
+function extractPublicId(url) {
+  if (!url || typeof url !== "string") return null;
+  const parts = url.split("/upload/");
+  if (parts.length < 2) return null;
+  let afterUpload = parts[1]; // upload/ дараах бүх path
+  afterUpload = afterUpload.replace(/^v\d+\//, ""); // version prefix арилгах
+  return afterUpload.split(".")[0]; // file extension-ийг хасах
+}
+
+// ============================================
+// ✅ Админаас зөвхөн list харж байгаа нь шүү
 // ============================================
 export const getResorts = async (req, res) => {
   try {
@@ -22,24 +34,31 @@ export const getResorts = async (req, res) => {
       },
       {
         $addFields: {
-          image: { $arrayElemAt: ["$files.images.url", 0] },
+          image: { $arrayElemAt: ["$files.images", 0] },
         },
       },
       {
-        $project: { files: 0, __v: 0 },
+        $project: {
+          files: 0,
+          __v: 0,
+        },
       },
       { $sort: { createdAt: -1 } },
     ]);
 
-    res.status(200).json({ success: true, resorts });
+    res.status(200).json({
+      success: true,
+      count: resorts.length,
+      resorts,
+    });
   } catch (err) {
+    console.error("❌ getResorts алдаа:", err);
     res.status(500).json({ success: false, message: err.message });
   }
 };
 
-
 // ============================================
-// GET RESORT BY ID
+// ✅ GET resort by ID
 // ============================================
 export const getResortById = async (req, res) => {
   try {
@@ -47,206 +66,154 @@ export const getResortById = async (req, res) => {
     if (!resort) return res.status(404).json({ message: "Resort олдсонгүй" });
 
     const files = await File.find({ resortsId: resort._id });
-
     res.json({ resort, files });
   } catch (err) {
+    console.error("❌ getResortById алдаа:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-
 // ============================================
-// CREATE RESORT + CLOUDINARY FILES
+// ✅ CREATE new resort
 // ============================================
 export const createResort = async (req, res) => {
   try {
     const { name, description, price, location } = req.body;
-
-    const newResort = await Resort.create({
-      name,
-      description,
-      price,
-      location,
-    });
+    const newResort = new Resort({ name, description, price, location });
+    const savedResort = await newResort.save();
 
     let images = [];
     let videos = [];
 
-    // Upload images
-    if (req.files?.images) {
-      for (const file of req.files.images) {
-        const uploaded = await cloudinary.uploader.upload(file.path, {
-          folder: "amaralt/resorts/images",
-        });
-        images.push({
-          url: uploaded.secure_url,
-          public_id: uploaded.public_id,
-        });
-      }
-    }
+    if (req.files) {
+      if (req.files.images) images = req.files.images.map((f) => f.path);
+      if (req.files.videos) videos = req.files.videos.map((f) => f.path);
 
-    // Upload videos
-    if (req.files?.videos) {
-      for (const file of req.files.videos) {
-        const uploaded = await cloudinary.uploader.upload(file.path, {
-          folder: "amaralt/resorts/videos",
-          resource_type: "video",
+      if (images.length > 0 || videos.length > 0) {
+        const newFile = new File({
+          resortsId: savedResort._id,
+          images,
+          videos,
         });
-        videos.push({
-          url: uploaded.secure_url,
-          public_id: uploaded.public_id,
-        });
+        await newFile.save();
       }
-    }
-
-    // Save to File collection
-    if (images.length > 0 || videos.length > 0) {
-      await File.create({
-        resortsId: newResort._id,
-        images,
-        videos,
-      });
     }
 
     res.status(201).json({
       success: true,
       message: "🏕️ Resort амжилттай нэмэгдлээ",
-      resort: newResort,
+      resort: savedResort,
+      images,
+      videos,
     });
   } catch (error) {
+    console.error("❌ Resort үүсгэхэд алдаа:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-
 // ============================================
-// UPDATE RESORT (Cloudinary delete + add)
+// ✅ UPDATE resort
 // ============================================
 export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
     const { name, description, price, location, removedImages, removedVideos } = req.body;
 
-    const removedImg = removedImages ? JSON.parse(removedImages) : [];
-    const removedVid = removedVideos ? JSON.parse(removedVideos) : [];
+    const parsedRemovedImages = removedImages ? JSON.parse(removedImages) : [];
+    const parsedRemovedVideos = removedVideos ? JSON.parse(removedVideos) : [];
 
     const resort = await Resort.findById(id);
     if (!resort) return res.status(404).json({ message: "Resort олдсонгүй" });
 
-    // Update base info
+    // 📝 Үндсэн мэдээлэл шинэчлэх
     resort.name = name || resort.name;
     resort.description = description || resort.description;
     resort.price = price || resort.price;
     resort.location = location || resort.location;
     await resort.save();
 
-    // Delete removed images (Cloudinary)
-    for (const img of removedImg) {
-      if (img.public_id) await cloudinary.uploader.destroy(img.public_id);
+    // 🗑️ Устгах хэсэг
+    for (const url of parsedRemovedImages) {
+      const publicId = extractPublicId(url);
+      if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
+    }
+    for (const url of parsedRemovedVideos) {
+      const publicId = extractPublicId(url);
+      if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
     }
 
-    // Delete removed videos
-    for (const vid of removedVid) {
-      if (vid.public_id) {
-        await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
-      }
+    // MongoDB-с устгах ($pull)
+    if (parsedRemovedImages.length > 0) {
+      await File.updateMany({ resortsId: id }, { $pull: { images: { $in: parsedRemovedImages } } });
+    }
+    if (parsedRemovedVideos.length > 0) {
+      await File.updateMany({ resortsId: id }, { $pull: { videos: { $in: parsedRemovedVideos } } });
     }
 
-    // Remove from DB
-    await File.updateMany(
-      { resortsId: id },
-      { 
-        $pull: { 
-          images: { public_id: { $in: removedImg.map(i => i.public_id) } },
-          videos: { public_id: { $in: removedVid.map(v => v.public_id) } },
-        }
-      }
-    );
-
-    // UPLOAD NEW IMAGES
-    if (req.files?.images) {
-      const uploadedImages = [];
-      for (const file of req.files.images) {
-        const upload = await cloudinary.uploader.upload(file.path, {
-          folder: "amaralt/resorts/images",
-        });
-        uploadedImages.push({
-          url: upload.secure_url,
-          public_id: upload.public_id,
-        });
-      }
-
-      await File.updateOne(
-        { resortsId: id },
-        { $push: { images: { $each: uploadedImages } } },
-        { upsert: true }
-      );
+    // Шинэ файлуудыг upload
+    if (req.files?.images?.length) {
+      const images = req.files.images.map((f) => f.path);
+      await File.updateOne({ resortsId: id }, { $push: { images: { $each: images } } }, { upsert: true });
+    }
+    if (req.files?.videos?.length) {
+      const videos = req.files.videos.map((f) => f.path);
+      await File.updateOne({ resortsId: id }, { $push: { videos: { $each: videos } } }, { upsert: true });
     }
 
-    // UPLOAD NEW VIDEOS
-    if (req.files?.videos) {
-      const uploadedVideos = [];
-      for (const file of req.files.videos) {
-        const upload = await cloudinary.uploader.upload(file.path, {
-          folder: "amaralt/resorts/videos",
-          resource_type: "video",
-        });
-        uploadedVideos.push({
-          url: upload.secure_url,
-          public_id: upload.public_id,
-        });
-      }
-
-      await File.updateOne(
-        { resortsId: id },
-        { $push: { videos: { $each: uploadedVideos } } },
-        { upsert: true }
-      );
-    }
-
+    // Хоосон File бичлэг устгах
     const files = await File.find({ resortsId: id });
+    for (const f of files) {
+      if (!(f.images?.length) && !(f.videos?.length)) {
+        await File.deleteOne({ _id: f._id });
+      }
+    }
 
+    const filesAfter = await File.find({ resortsId: id });
     res.json({
       success: true,
-      message: "Resort амжилттай шинэчлэгдлээ!",
+      message: "✅ Resort зураг болон бичлэг амжилттай шинэчлэгдлээ!",
       resort,
-      files,
+      files: filesAfter,
     });
-
   } catch (err) {
+    console.error("❌ Resort шинэчлэхэд алдаа:", err);
     res.status(500).json({ message: err.message });
   }
 };
 
-
 // ============================================
-// DELETE RESORT + CLOUDINARY FILES
+// ✅ DELETE resort + related files
 // ============================================
 export const deleteResort = async (req, res) => {
   try {
     const { id } = req.params;
-
     const resort = await Resort.findById(id);
-    if (!resort) return res.status(404).json({ message: "Resort олдсонгүй" });
+    if (!resort) return res.status(404).json({ success: false, message: "Resort олдсонгүй" });
 
     const files = await File.find({ resortsId: id });
 
-    // Delete cloudinary images/videos
     for (const file of files) {
-      for (const img of file.images) {
-        await cloudinary.uploader.destroy(img.public_id);
+      for (const url of file.images || []) {
+        const publicId = extractPublicId(url);
+        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
       }
-      for (const vid of file.videos) {
-        await cloudinary.uploader.destroy(vid.public_id, { resource_type: "video" });
+      for (const url of file.videos || []) {
+        const publicId = extractPublicId(url);
+        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
       }
     }
 
+    // DB устгах
     await File.deleteMany({ resortsId: id });
     await Resort.findByIdAndDelete(id);
 
-    res.json({ success: true, message: "Resort устгагдлаа" });
-
+    res.json({
+      success: true,
+      message: "🏕️ Resort болон холбогдсон файлууд амжилттай устлаа",
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("❌ Resort устгахад алдаа:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };

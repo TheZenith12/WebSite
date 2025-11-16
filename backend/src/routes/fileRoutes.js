@@ -16,8 +16,8 @@ router.get("/:id", getResortById);
 router.post(
   "/new",
   upload.fields([
-    { name: "images", maxCount: 10 },
-    { name: "videos", maxCount: 5 },
+    { name: "images", maxCount: 20 },
+    { name: "videos", maxCount: 20 },
   ]),
   createResort
 );
@@ -25,8 +25,8 @@ router.post(
 router.put(
   "/:id",
   upload.fields([
-    { name: "images", maxCount: 10 },
-    { name: "videos", maxCount: 5 },
+    { name: "images", maxCount: 20 },
+    { name: "videos", maxCount: 20 },
   ]),
   updateResort
 );
