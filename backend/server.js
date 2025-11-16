@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Middleware
 app.use(cors({
-  origin: ["http://localhost:5173", "http://localhost:5174"],
+  origin: ["http://amaraltws.vercel.app", "https://amaraltws-admin.vercel.app", "http://localhost:3000"],
   credentials: true
 }));
 
