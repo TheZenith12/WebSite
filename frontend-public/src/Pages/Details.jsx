@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL;
 const mapKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
 
 // 🧩 Зураг цэвэрлэх функц

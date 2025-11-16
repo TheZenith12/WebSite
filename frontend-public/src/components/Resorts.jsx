@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 
-const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_BASE = import.meta.env.VITE_API_URL;
 
 function Resorts() {
   const [list, setList] = useState([]);
