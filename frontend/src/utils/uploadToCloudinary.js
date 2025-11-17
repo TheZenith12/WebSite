@@ -1,5 +1,7 @@
 export async function uploadToCloudinary(file, preset, folder) {
-  const url = "https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/upload";
+  const url = "https://api.cloudinary.com/v1_1/dl9bp4ja3/upload";
+
+  const preset = "resort_unsigned"; // preset name
 
   const formData = new FormData();
   formData.append("file", file);

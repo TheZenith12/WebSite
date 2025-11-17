@@ -1,0 +1,2 @@
+import viteLogo from '../assets/vite.svg';
+<img src={viteLogo} alt="Vite logo" />
