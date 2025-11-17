@@ -93,13 +93,9 @@ export const createResort = async (req, res) => {
   }
 };
 
-// --------------------------------------------------
-// ✅ UPDATE Resort 
-// (Frontend Cloudinary URL ирнэ, File model update, delete)
-// --------------------------------------------------
 export const updateResort = async (req, res) => {
   try {
-    const id = req.params.id;
+    const { id } = req.params;
     const {
       name,
       description,
@@ -111,32 +107,33 @@ export const updateResort = async (req, res) => {
       removedVideos,
     } = req.body;
 
-    
+    // ✅ Resort олж авах
     const resort = await Resort.findById(id);
-    if (!resort) return res.status(404).json({ message: "Not found" });
+    if (!resort) return res.status(404).json({ message: "Resort олдсонгүй" });
 
-    resort.name = name;
-    resort.description = description;
-    resort.price = price;
-    resort.location = location;
+    // ✅ Үндсэн мэдээлэл шинэчлэх
+    resort.name = name || resort.name;
+    resort.description = description || resort.description;
+    resort.price = price || resort.price;
+    resort.location = location || resort.location;
     await resort.save();
 
-    // 🗑️ Cloudinary real delete
+    // 🗑️ Cloudinary дээр устгах
     if (removedImages?.length) {
       for (const url of removedImages) {
-        const pid = extractPublicId(url);
-        if (pid) await cloudinary.uploader.destroy(pid, { resource_type: "image" });
+        const publicId = extractPublicId(url);
+        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
       }
     }
 
     if (removedVideos?.length) {
       for (const url of removedVideos) {
-        const pid = extractPublicId(url);
-        if (pid) await cloudinary.uploader.destroy(pid, { resource_type: "video" });
+        const publicId = extractPublicId(url);
+        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
       }
     }
 
-    // MongoDB update
+    // ✅ MongoDB update
     await File.updateOne(
       { resortsId: id },
       {
@@ -152,8 +149,9 @@ export const updateResort = async (req, res) => {
       { upsert: true }
     );
 
-    res.json({ success: true, message: "Resort updated successfully" });
+    res.json({ success: true, message: "Resort updated successfully", resort });
   } catch (err) {
+    console.error("❌ updateResort error:", err);
     res.status(500).json({ message: err.message });
   }
 };
