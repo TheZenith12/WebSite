@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams, useNavigate } from "react-router-dom";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -15,44 +16,44 @@ function EditResort() {
     location: "",
   });
 
-  const [existingImages, setExistingImages] = useState([]); // Backend-аас ирсэн зургууд
+  const [existingImages, setExistingImages] = useState([]);
   const [existingVideos, setExistingVideos] = useState([]);
-  const [newImages, setNewImages] = useState([]); // Шинэ сонгосон зургууд
+
+  const [newImages, setNewImages] = useState([]);
   const [newVideos, setNewVideos] = useState([]);
-  const [previewUrls, setPreviewUrls] = useState([]); // Шинэ зургуудын preview
-  const [loading, setLoading] = useState(false);
-  const [initializing, setInitializing] = useState(true);
-  const [error, setError] = useState("");
+
   const [removedImages, setRemovedImages] = useState([]);
   const [removedVideos, setRemovedVideos] = useState([]);
 
-  // 🔹 Resort мэдээлэл татах
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [videoPreviews, setVideoPreviews] = useState([]);
+
+  const [loading, setLoading] = useState(false);
+  const [initializing, setInitializing] = useState(true);
+  const [error, setError] = useState("");
+
+  // ============================
+  // Resort мэдээлэл татах
+  // ============================
   useEffect(() => {
     const fetchResort = async () => {
       try {
-        if (!id) {
-          setError("Resort ID олдсонгүй");
-          return;
-        }
-
         const res = await axios.get(`${API_BASE}/api/admin/resorts/${id}`);
 
-        const resort = res.data.resort || res.data;
+        const resort = res.data.resort;
         const files = res.data.files || [];
 
         setForm({
-          name: resort?.name || "",
-          description: resort?.description || "",
-          price: resort?.price || "",
-          location: resort?.location || "",
+          name: resort.name,
+          description: resort.description,
+          price: resort.price,
+          location: resort.location,
         });
 
-     
-        setExistingImages(files.filter((f) => f.images).flatMap((f) => f.images));
-        setExistingVideos(files.filter((f) => f.videos).flatMap((f) => f.videos));
+        setExistingImages(files.flatMap((f) => f.images || []));
+        setExistingVideos(files.flatMap((f) => f.videos || []));
       } catch (err) {
-        console.error("Error loading resort:", err);
-        setError(err.response?.data?.message || "Resort ачаалахад алдаа гарлаа");
+        setError("Амралтын газар ачаалахад алдаа гарлаа");
       } finally {
         setInitializing(false);
       }
@@ -61,154 +62,168 @@ function EditResort() {
     fetchResort();
   }, [id]);
 
-  
+  // ============================
+  // Input change
+  // ============================
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  
+  // ============================
+  // Шинэ зураг
+  // ============================
   const handleNewImages = (e) => {
     const files = Array.from(e.target.files);
     setNewImages((prev) => [...prev, ...files]);
-    const urls = files.map((file) => URL.createObjectURL(file));
-    console.log("files:", files)
-    console.log("urls:", urls)
-    setPreviewUrls((prev) => [...prev, ...urls]);
+
+    const preview = files.map((file) => URL.createObjectURL(file));
+    setImagePreviews((prev) => [...prev, ...preview]);
   };
 
-  
+  // ============================
+  // Шинэ бичлэг
+  // ============================
   const handleNewVideos = (e) => {
     const files = Array.from(e.target.files);
     setNewVideos((prev) => [...prev, ...files]);
-    const urls = files.map((file) => URL.createObjectURL(file));
-    console.log("files:", files)
-    console.log("urls:", urls)
-    setPreviewUrls((prev) => [...prev, ...urls]);
+
+    const preview = files.map((file) => URL.createObjectURL(file));
+    setVideoPreviews((prev) => [...prev, ...preview]);
   };
 
- 
-  const removeExistingImage = (index) => {
-  const deleted = existingImages[index]; 
-  setRemovedImages((prev) => [...prev, deleted]); 
-  setExistingImages(existingImages.filter((_, i) => i !== index)); 
+  // ============================
+  // Remove old media
+  // ============================
+  const removeExistingImage = (i) => {
+    setRemovedImages((prev) => [...prev, existingImages[i]]);
+    setExistingImages(existingImages.filter((_, idx) => idx !== i));
   };
 
-  const removeExistingVideo = (index) => {
-  const deleted = existingVideos[index]; 
-  setRemovedVideos((prev) => [...prev, deleted]); 
-  setExistingVideos(existingVideos.filter((_, i) => i !== index)); // UI-аас хасах
+  const removeExistingVideo = (i) => {
+    setRemovedVideos((prev) => [...prev, existingVideos[i]]);
+    setExistingVideos(existingVideos.filter((_, idx) => idx !== i));
   };
 
-    const removeNewImage = (index) => {
-    setNewImages(newImages.filter((_, i) => i !== index));
-    setPreviewUrls(previewUrls.filter((_, i) => i !== index));
-    console.log("newImages:",newImages)
-    console.log("previewUrls:",previewUrls)
-  };
-  
-    const removeNewVideo = (index) => {
-    setNewVideos(newVideos.filter((_, i) => i !== index));
-    setPreviewUrls(previewUrls.filter((_, i) => i !== index));
-    console.log("newVideos:",newVideos)
-    console.log("previewUrls:",previewUrls)
+  // ============================
+  // Remove new media
+  // ============================
+  const removeNewImage = (i) => {
+    setNewImages(newImages.filter((_, idx) => idx !== i));
+    setImagePreviews(imagePreviews.filter((_, idx) => idx !== i));
   };
 
-  // 🔹 Submit
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  const removeNewVideo = (i) => {
+    setNewVideos(newVideos.filter((_, idx) => idx !== i));
+    setVideoPreviews(videoPreviews.filter((_, idx) => idx !== i));
+  };
 
-  const formData = new FormData();
-  formData.append("name", form.name);
-  formData.append("description", form.description);
-  formData.append("price", form.price);
-  formData.append("location", form.location);
+  // ============================
+  // Submit
+  // ============================
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  newImages.forEach((img) => formData.append("images", img));
-  newVideos.forEach((vid) => formData.append("videos", vid));
+    try {
+      // 🔥 1. Cloudinary руу upload
+      const uploadedImages = [];
+      for (let img of newImages) {
+        const url = await uploadToCloudinary(img);
+        uploadedImages.push(url);
+      }
 
-  formData.append("removedImages", JSON.stringify(removedImages));
-  formData.append("removedVideos", JSON.stringify(removedVideos));
+      const uploadedVideos = [];
+      for (let vid of newVideos) {
+        const url = await uploadToCloudinary(vid);
+        uploadedVideos.push(url);
+      }
 
-  try {
-    await axios.put(`${API_BASE}/api/admin/resorts/edit/${id}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    alert("✅ Амжилттай шинэчлэгдлээ!");
-    setForm({ name: "", description: "", price: "", location: "" });
-      setNewImages([]);
-      setNewVideos([]);
-      setPreviewUrls([]);
-    navigate("/resorts");
-  } catch (err) {
-    console.error("❌ Update error:", err);
-    alert("Амралтын газар шинэчлэхэд алдаа гарлаа!");
-  } finally {
-    setLoading(false);
-  }
-};
+      // 🔥 2. Backend рүү зөвхөн URL илгээнэ
+      const payload = {
+        ...form,
+        newImages: uploadedImages,
+        newVideos: uploadedVideos,
+        removedImages,
+        removedVideos,
+      };
 
+      await axios.put(`${API_BASE}/api/admin/resorts/edit/${id}`, payload);
 
-  if (initializing) return <p>Loading...</p>;
+      alert("Амжилттай шинэчлэв 🎉");
+      navigate("/resorts");
+    } catch (err) {
+      console.error(err);
+      alert("Алдаа гарлаа!");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ============================
+  // UI
+  // ============================
+  if (initializing) return <p>Түр хүлээнэ үү...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
-      <h2 className="text-2xl font-semibold mb-4">✏️ Амралтын газар засах</h2>
+      <h2 className="text-2xl font-semibold mb-4">Амралтын газар засах</h2>
 
       <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow">
-        {/* 📝 Нэр, тайлбар, үнэ, байршил */}
-        <input type="text" name="name" value={form.name} onChange={handleChange} placeholder="Нэр" className="border w-full px-3 py-2 rounded" required />
-        <textarea name="description" value={form.description} onChange={handleChange} placeholder="Тайлбар" className="border w-full px-3 py-2 rounded" required />
-        <input type="number" name="price" value={form.price} onChange={handleChange} placeholder="Үнэ" className="border w-full px-3 py-2 rounded" required />
-        <input type="text" name="location" value={form.location} onChange={handleChange} placeholder="Байршил" className="border w-full px-3 py-2 rounded" required />
 
-        {/* 🖼️ Одоо байгаа зургууд */}
-        <div>
-          <h3 className="font-medium mt-3 mb-1">Одоо байгаа зургууд</h3>
-          <div className="flex flex-wrap gap-2">
-            {existingImages.map((img, i) => (
-              <div key={i} className="relative">
-                <img src={img} alt="" className="w-24 h-24 object-cover rounded" />
-                <button type="button" onClick={() => removeExistingImage(i)} className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded">✕</button>
-              </div>
-            ))}
-          </div>
+        {/* TEXT FIELDS */}
+        <input type="text" name="name" value={form.name} onChange={handleChange} className="border w-full p-2 rounded" />
+        <textarea name="description" value={form.description} onChange={handleChange} className="border w-full p-2 rounded" />
+        <input type="number" name="price" value={form.price} onChange={handleChange} className="border w-full p-2 rounded" />
+        <input type="text" name="location" value={form.location} onChange={handleChange} className="border w-full p-2 rounded" />
+
+        {/* EXISTING IMAGES */}
+        <h3 className="font-medium">Одоо байгаа зургууд</h3>
+        <div className="flex flex-wrap gap-2">
+          {existingImages.map((img, i) => (
+            <div key={i} className="relative">
+              <img src={img} className="w-24 h-24 object-cover rounded" />
+              <button type="button" onClick={() => removeExistingImage(i)} className="absolute top-0 right-0 bg-red-600 text-white px-1 rounded text-xs">✕</button>
+            </div>
+          ))}
         </div>
 
-
-        <div>
-          <h3 className="font-medium mt-3 mb-1">Шинэ зургууд</h3>
-          <input type="file" multiple accept="image/*" onChange={handleNewImages} />
-          <div className="flex flex-wrap gap-2 mt-2">
-            {previewUrls.map((url, i) => (
-              <div key={i} className="relative">
-                <img src={url} alt="" className="w-24 h-24 object-cover rounded" />
-                <button type="button" onClick={() => removeNewImage(i)} className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded">✕</button>
-              </div>
-            ))}
-          </div>
+        {/* NEW IMAGES */}
+        <h3 className="font-medium">Шинэ зургууд</h3>
+        <input type="file" multiple accept="image/*" onChange={handleNewImages} />
+        <div className="flex flex-wrap gap-2 mt-2">
+          {imagePreviews.map((url, i) => (
+            <div key={i} className="relative">
+              <img src={url} className="w-24 h-24 object-cover rounded" />
+              <button type="button" onClick={() => removeNewImage(i)} className="absolute top-0 right-0 bg-red-600 text-white px-1 rounded text-xs">✕</button>
+            </div>
+          ))}
         </div>
 
-   
-        <div>
-          <h3 className="font-medium mt-3 mb-1">Бичлэгүүд</h3>
-          <div className="flex flex-wrap gap-2">
-            {existingVideos.map((vid, i) => (
-              <div key={i} className="relative">
-                <video width="120" height="90" controls src={vid} className="rounded" />
-                <button type="button" onClick={() => removeExistingVideo(i)} className="absolute top-0 right-0 bg-red-500 text-white text-xs px-1 rounded">✕</button>
-              </div>
-            ))}
-          </div>
+        {/* EXISTING VIDEOS */}
+        <h3 className="font-medium">Одоо байгаа бичлэгүүд</h3>
+        <div className="flex flex-wrap gap-2">
+          {existingVideos.map((vid, i) => (
+            <div key={i} className="relative">
+              <video src={vid} width="120" controls className="rounded" />
+              <button type="button" onClick={() => removeExistingVideo(i)} className="absolute top-0 right-0 bg-red-600 text-white px-1 rounded text-xs">✕</button>
+            </div>
+          ))}
         </div>
 
-        <div>
-          <label className="block font-medium mb-1 mt-3">Шинэ бичлэг оруулах</label>
-          <input type="file" multiple accept="video/*" onChange={handleNewVideos} />
+        {/* NEW VIDEOS */}
+        <h3 className="font-medium">Шинэ бичлэгүүд</h3>
+        <input type="file" multiple accept="video/*" onChange={handleNewVideos} />
+        <div className="flex flex-wrap gap-2 mt-2">
+          {videoPreviews.map((url, i) => (
+            <div key={i} className="relative">
+              <video src={url} width="120" controls className="rounded" />
+              <button type="button" onClick={() => removeNewVideo(i)} className="absolute top-0 right-0 bg-red-600 text-white px-1 rounded text-xs">✕</button>
+            </div>
+          ))}
         </div>
 
-        <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 mt-4">
+        <button type="submit" disabled={loading} className="bg-green-600 text-white px-4 py-2 rounded">
           {loading ? "Хадгалж байна..." : "Шинэчлэх"}
         </button>
       </form>

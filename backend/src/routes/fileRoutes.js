@@ -1,5 +1,4 @@
 import express from "express";
-import upload from "../middleware/upload.js"; // Cloudinary upload
 import {
   getResorts,
   getResortById,
@@ -15,19 +14,11 @@ router.get("/:id", getResortById);
 
 router.post(
   "/new",
-  upload.fields([
-    { name: "images", maxCount: 20 },
-    { name: "videos", maxCount: 20 },
-  ]),
   createResort
 );
 
 router.put(
   "/:id",
-  upload.fields([
-    { name: "images", maxCount: 20 },
-    { name: "videos", maxCount: 20 },
-  ]),
   updateResort
 );
 

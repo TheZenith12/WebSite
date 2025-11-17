@@ -17,7 +17,14 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware
-app.use(cors()); // бүх origin-д нээлттэй
+app.use(cors({
+  origin: [
+    "https://amaraltws-admin.vercel.app",
+    "https://amaraltws-public.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true,
+})); // бүх origin-д нээлттэй
 
 
 connectDB();

@@ -6,7 +6,6 @@ import {
   updateResort,
   deleteResort,
 } from "../controllers/resortController.js";
-import upload from "../middleware/upload.js";
 
 const router = express.Router();
 
@@ -16,19 +15,11 @@ router.get("/:id", getResortById);
 
 router.post(
   "/new",
-  upload.fields([
-    { name: "images", maxCount: 20 },
-    { name: "videos", maxCount: 20 },
-  ]),
   createResort
 );
 
 router.put(
   "/edit/:id",
-  upload.fields([
-    { name: "images", maxCount: 20 },
-    { name: "videos", maxCount: 20 },
-  ]),
   updateResort
 );
 

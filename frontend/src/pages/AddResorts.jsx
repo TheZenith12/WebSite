@@ -10,38 +10,44 @@ export default function AddResort() {
     price: "",
     location: "",
   });
+
   const [images, setImages] = useState([]);
   const [videos, setVideos] = useState([]);
   const [previewUrls, setPreviewUrls] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  // 🧾 Text input
+  // 🧾 Input handler
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // 🖼️ Олон зураг сонгох
+  // 🖼️ Multiple image select + preview
   const handleImages = (e) => {
     const files = Array.from(e.target.files);
-    setImages((prev) => [...prev, ...files]); // шинэ зураг нэмэх
+    setImages((prev) => [...prev, ...files]);
+
     const newPreviews = files.map((file) => URL.createObjectURL(file));
     setPreviewUrls((prev) => [...prev, ...newPreviews]);
   };
 
-  // 🎥 Олон видео
-  const handleVideos = (e) => setVideos([...e.target.files]);
+  // 🎥 Multiple videos
+  const handleVideos = (e) => {
+    const files = Array.from(e.target.files);
+    setVideos((prev) => [...prev, ...files]);
+  };
 
-  // 🖼️ Preview-с зураг устгах
+  // 🗑️ Remove preview image
   const removeImage = (index) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // 📨 Submit
+  // 📤 Submit → BACKEND (multipart/form-data)
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     const formData = new FormData();
+
     formData.append("name", form.name);
     formData.append("description", form.description);
     formData.append("price", form.price);
@@ -54,7 +60,10 @@ export default function AddResort() {
       await axios.post(`${API_BASE}/api/admin/resorts/new`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
       alert("Амжилттай нэмэгдлээ!");
+
+      // Reset form
       setForm({ name: "", description: "", price: "", location: "" });
       setImages([]);
       setVideos([]);
@@ -71,7 +80,10 @@ export default function AddResort() {
     <div className="p-6 max-w-3xl mx-auto">
       <h2 className="text-2xl font-semibold mb-4">Амралтын газар нэмэх</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 bg-white p-4 rounded shadow"
+      >
         <input
           name="name"
           placeholder="Нэр"
@@ -79,6 +91,7 @@ export default function AddResort() {
           onChange={handleChange}
           className="border w-full px-3 py-2 rounded"
         />
+
         <textarea
           name="description"
           placeholder="Тайлбар"
@@ -86,6 +99,7 @@ export default function AddResort() {
           onChange={handleChange}
           className="border w-full px-3 py-2 rounded"
         />
+
         <input
           name="price"
           type="number"
@@ -94,6 +108,7 @@ export default function AddResort() {
           onChange={handleChange}
           className="border w-full px-3 py-2 rounded"
         />
+
         <input
           name="location"
           placeholder="Байршил"
@@ -102,16 +117,17 @@ export default function AddResort() {
           className="border w-full px-3 py-2 rounded"
         />
 
-
+        {/* Images */}
         <div>
           <label className="font-medium">🖼️ Олон зураг сонгох</label>
           <input type="file" multiple accept="image/*" onChange={handleImages} />
+
           <div className="grid grid-cols-4 gap-2 mt-2">
             {previewUrls.map((url, i) => (
               <div key={i} className="relative">
                 <img
                   src={url}
-                  alt={`preview-${i}`}
+                  alt="preview"
                   className="w-24 h-24 object-cover rounded border"
                 />
                 <button
@@ -126,7 +142,7 @@ export default function AddResort() {
           </div>
         </div>
 
-
+        {/* Videos */}
         <div>
           <label className="font-medium">🎥 Бичлэгүүд</label>
           <input type="file" multiple accept="video/*" onChange={handleVideos} />
