@@ -21,17 +21,26 @@ app.use(
   cors({
     origin: [
       "https://amaraltws-admin.vercel.app",
-      "https://amaraltws-public.vercel.app",
-      "http://localhost:5173",
-      "http://localhost:5174"
+      "https://amaraltws.vercel.app",
     ],
-    methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
-    allowedHeaders: "Content-Type,Authorization",
+    methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
 
 app.options("*", cors());
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "https://amaraltws-admin.vercel.app");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+  res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 connectDB();
 
