@@ -1,10 +1,8 @@
 import Resort from "../models/resortModel.js";
 import File from "../models/fileModel.js";
-import cloudinary from "../utils/cloudinary.js";
 
-// --------------------------------------------------
-// 🧩 Cloudinary public_id гаргах функц
-// --------------------------------------------------
+
+
 function extractPublicId(url) {
   try {
     const parts = url.split("/upload/");
@@ -93,72 +91,44 @@ export const createResort = async (req, res) => {
   }
 };
 
-export const updateResort = async (req, res) => {
+export const  updateResort = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Frontend ээс ирсэн CLOUDINARY URL-үүд
     const {
-      name,
+      title,
+      location,
       description,
       price,
-      location,
-      images,
-      videos,
-      removedImages,
-      removedVideos,
+      images, // энэ нь Array(URL) байх ёстой
+      videos, // Array(URL)
     } = req.body;
 
-    // ✅ Resort олж авах
-    const resort = await Resort.findById(id);
-    if (!resort) return res.status(404).json({ message: "Resort олдсонгүй" });
-
-    // ✅ Үндсэн мэдээлэл шинэчлэх
-    resort.name = name || resort.name;
-    resort.description = description || resort.description;
-    resort.price = price || resort.price;
-    resort.location = location || resort.location;
-    await resort.save();
-
-    // 🗑️ Cloudinary дээр устгах
-    if (removedImages?.length) {
-      for (const url of removedImages) {
-        const publicId = extractPublicId(url);
-        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "image" });
-      }
-    }
-
-    if (removedVideos?.length) {
-      for (const url of removedVideos) {
-        const publicId = extractPublicId(url);
-        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
-      }
-    }
-
-    // ✅ MongoDB update
-    await File.updateOne(
-      { resortsId: id },
+    const updatedResort = await Resort.findByIdAndUpdate(
+      id,
       {
-        $pull: {
-          images: { $in: removedImages || [] },
-          videos: { $in: removedVideos || [] },
-        },
-        $push: {
-          images: { $each: images || [] },
-          videos: { $each: videos || [] },
-        },
+        title,
+        location,
+        description,
+        price,
+        images, 
+        videos,
       },
-      { upsert: true }
+      { new: true }
     );
 
-    res.json({ success: true, message: "Resort updated successfully", resort });
+    return res.json({
+      success: true,
+      resort: updatedResort,
+    });
   } catch (err) {
-    console.error("❌ updateResort error:", err);
-    res.status(500).json({ message: err.message });
+    console.log("❌ UPDATE ERROR:", err);
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
-// --------------------------------------------------
-// ✅ DELETE Resort (Cloudinary + MongoDB)
-// --------------------------------------------------
+
 export const deleteResort = async (req, res) => {
   try {
     const { id } = req.params;
@@ -167,17 +137,6 @@ export const deleteResort = async (req, res) => {
     if (!resort) return res.status(404).json({ message: "Not found" });
 
     const files = await File.find({ resortsId: id });
-
-    for (const f of files) {
-      for (const url of f.images || []) {
-        const pid = extractPublicId(url);
-        if (pid) await cloudinary.uploader.destroy(pid, { resource_type: "image" });
-      }
-      for (const url of f.videos || []) {
-        const pid = extractPublicId(url);
-        if (pid) await cloudinary.uploader.destroy(pid, { resource_type: "video" });
-      }
-    }
 
     await File.deleteMany({ resortsId: id });
     await Resort.findByIdAndDelete(id);

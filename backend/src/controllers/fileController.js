@@ -1,14 +1,6 @@
-import { v2 as cloudinary } from "cloudinary";
+
 import File from "../models/fileModel.js";
 import Resort from "../models/resortModel.js";
-import path from "path";
-import fs from "fs";
-
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
 
 export const getFiles = async (req, res) => {
   try {
@@ -50,7 +42,6 @@ export const uploadFile = async (req, res) => {
       },
       async (error, result) => {
         if (error) {
-          console.error("Cloudinary upload error:", error);
           return res.status(500).json({ message: "Upload амжилтгүй" });
         }
 
@@ -93,17 +84,6 @@ export const deleteFile = async (req, res) => {
     if (!file) return res.status(404).json({ message: "Файл олдсонгүй." });
 
 
-    const filePath = path.join(
-      process.cwd(),
-      "public",
-      file.image || file.video
-    );
-
-
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-      console.log("Файл устгасан:", filePath);
-    }
 
 
     await Resort.updateMany({ files: id }, { $pull: { files: id } });
