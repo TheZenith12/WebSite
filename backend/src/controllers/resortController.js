@@ -1,6 +1,7 @@
-import Resort from "../models/resortModel.js";
+import cloudinary from "../utils/cloudinary.js";
 import File from "../models/fileModel.js";
-
+import Resort from "../models/resortModel.js";
+import extractPublicId from "../utils/extractPublicId.js";
 
 
 function extractPublicId(url) {
@@ -91,39 +92,72 @@ export const createResort = async (req, res) => {
   }
 };
 
-export const  updateResort = async (req, res) => {
+export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Frontend ээс ирсэн CLOUDINARY URL-үүд
     const {
-      title,
-      location,
+      name,
       description,
       price,
-      images, // энэ нь Array(URL) байх ёстой
-      videos, // Array(URL)
+      location,
+      newImages,
+      newVideos,
+      removedImages,
+      removedVideos,
     } = req.body;
 
-    const updatedResort = await Resort.findByIdAndUpdate(
+    // 1) Resort update
+    await Resort.findByIdAndUpdate(
       id,
-      {
-        title,
-        location,
-        description,
-        price,
-        images, 
-        videos,
-      },
+      { name, description, price, location },
       { new: true }
     );
 
+    // 2) Files record авах
+    let files = await File.findOne({ resortsId: id });
+    if (!files) {
+      files = new File({ resortsId: id, images: [], videos: [] });
+    }
+
+    // 3) Устгах зураг
+    if (removedImages?.length) {
+      for (let url of removedImages) {
+        const publicId = extractPublicId(url);
+        if (publicId) await cloudinary.uploader.destroy(publicId);
+      }
+
+      files.images = files.images.filter((img) => !removedImages.includes(img));
+    }
+
+    // 4) Устгах видео
+    if (removedVideos?.length) {
+      for (let url of removedVideos) {
+        const publicId = extractPublicId(url);
+        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+      }
+
+      files.videos = files.videos.filter((v) => !removedVideos.includes(v));
+    }
+
+    // 5) Шинэ зургууд нэмэх
+    if (newImages?.length) {
+      files.images.push(...newImages);
+    }
+
+    // 6) Шинэ видеонууд нэмэх
+    if (newVideos?.length) {
+      files.videos.push(...newVideos);
+    }
+
+    // 7) Save
+    await files.save();
+
     return res.json({
       success: true,
-      resort: updatedResort,
+      message: "Resort амжилттай шинэчлэгдлээ",
     });
   } catch (err) {
-    console.log("❌ UPDATE ERROR:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };

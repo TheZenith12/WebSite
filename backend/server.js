@@ -17,15 +17,21 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Middleware
-app.use(cors({
-  origin: [
-    "https://amaraltws-admin.vercel.app",
-    "https://amaraltws-public.vercel.app"
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-  credentials: true,
-})); // бүх origin-д нээлттэй
+app.use(
+  cors({
+    origin: [
+      "https://amaraltws-admin.vercel.app",
+      "https://amaraltws-public.vercel.app",
+      "http://localhost:5173",
+      "http://localhost:5174"
+    ],
+    methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
+    allowedHeaders: "Content-Type,Authorization",
+    credentials: true,
+  })
+);
 
+app.options("*", cors());
 
 connectDB();
 
