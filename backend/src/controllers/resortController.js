@@ -1,8 +1,6 @@
 import cloudinary from "../utils/cloudinary.js";
 import File from "../models/fileModel.js";
 import Resort from "../models/resortModel.js";
-import extractPublicId from "../utils/extractPublicId.js";
-
 
 function extractPublicId(url) {
   try {
