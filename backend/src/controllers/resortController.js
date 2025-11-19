@@ -125,10 +125,19 @@ export const updateResort = async (req, res) => {
       files.videos = files.videos.filter((v) => !removedVideos.includes(v));
     }
 
-    // 5) Шинэ зургууд нэмэх
-    if (newImages?.length) {
-      files.images.push(...newImages);
-    }
+    // 5) Шинэ зургууд upload хийж нэмэх
+if (newImages?.length) {
+  for (const file of newImages) {
+    const uploaded = await cloudinary.uploader.upload(file.path, {
+      folder: "resorts/images",
+    });
+
+    files.images.push({
+      url: uploaded.secure_url,
+      publicId: uploaded.public_id,
+    });
+  }
+}
 
     // 6) Шинэ видеонууд нэмэх
     if (newVideos?.length) {
