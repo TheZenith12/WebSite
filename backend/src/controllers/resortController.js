@@ -1,21 +1,6 @@
-import cloudinary from "../utils/cloudinary.js";
+import { cloudinary, extractPublicId } from "../utils/cloudinary.js";
 import File from "../models/fileModel.js";
 import Resort from "../models/resortModel.js";
-import extractPublicId from "../utils/extractPublicId.js";
-
-
-function extractPublicId(url) {
-  try {
-    const parts = url.split("/upload/");
-    if (parts.length < 2) return null;
-
-    let rest = parts[1];
-    rest = rest.replace(/^v\d+\//, "");
-    return rest.split(".")[0];
-  } catch {
-    return null;
-  }
-}
 
 // --------------------------------------------------
 // ✅ GET ALL Resorts
