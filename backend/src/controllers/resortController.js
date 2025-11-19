@@ -127,18 +127,9 @@ export const updateResort = async (req, res) => {
 
     // 5) Шинэ зургууд upload хийж нэмэх
 if (newImages?.length) {
-  for (const file of newImages) {
-    const uploaded = await cloudinary.uploader.upload(file.path, {
-      folder: "resorts/images",
-    });
-
-    files.images.push({
-      url: uploaded.secure_url,
-      publicId: uploaded.public_id,
-    });
-  }
-}
-
+      files.images.push(...newImages);
+    }
+    
     // 6) Шинэ видеонууд нэмэх
     if (newVideos?.length) {
       files.videos.push(...newVideos);
