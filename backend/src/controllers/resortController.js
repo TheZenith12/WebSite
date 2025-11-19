@@ -105,31 +105,35 @@ export const updateResort = async (req, res) => {
       files = new File({ resortsId: id, images: [], videos: [] });
     }
 
-    // 3) Устгах зураг
     if (removedImages?.length) {
       for (let url of removedImages) {
         const publicId = extractPublicId(url);
         if (publicId) await cloudinary.uploader.destroy(publicId);
       }
 
-      files.images = files.images.filter((img) => !removedImages.includes(img));
+      files.images = files.images.filter(
+        (img) => !removedImages.includes(img.url)
+      );
     }
 
     // 4) Устгах видео
+     // 4️⃣ Хуучин видео устгах
     if (removedVideos?.length) {
       for (let url of removedVideos) {
         const publicId = extractPublicId(url);
         if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
       }
 
-      files.videos = files.videos.filter((v) => !removedVideos.includes(v));
+      files.videos = files.videos.filter(
+        (v) => !removedVideos.includes(v.url)
+      );
     }
 
     // 5) Шинэ зургууд upload хийж нэмэх
 if (newImages?.length) {
       files.images.push(...newImages);
     }
-    
+
     // 6) Шинэ видеонууд нэмэх
     if (newVideos?.length) {
       files.videos.push(...newVideos);
