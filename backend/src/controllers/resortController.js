@@ -2,6 +2,12 @@ import { cloudinary, extractPublicId } from "../utils/cloudinary.js";
 import File from "../models/fileModel.js";
 import Resort from "../models/resortModel.js";
 
+
+const removedImagesSafe = Array.isArray(removedImages) ? removedImages : [];
+const removedVideosSafe = Array.isArray(removedVideos) ? removedVideos : [];
+const newImagesSafe = Array.isArray(newImages) ? newImages : [];
+const newVideosSafe = Array.isArray(newVideos) ? newVideos : [];
+
 // --------------------------------------------------
 // ✅ GET ALL Resorts
 // --------------------------------------------------
@@ -81,83 +87,91 @@ export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const {
+    let {
       name,
       description,
       price,
       location,
-      newImages = [],
-      newVideos = [],
-      removedImages = [],
-      removedVideos = [],
+      newImages,
+      newVideos,
+      removedImages,
+      removedVideos,
     } = req.body;
 
-    // 1) Resort update
+    // Safety — FormData ирдэг бол string JSON байж болно
+    try {
+      if (typeof newImages === "string") newImages = JSON.parse(newImages);
+      if (typeof newVideos === "string") newVideos = JSON.parse(newVideos);
+      if (typeof removedImages === "string") removedImages = JSON.parse(removedImages);
+      if (typeof removedVideos === "string") removedVideos = JSON.parse(removedVideos);
+    } catch (e) {
+      console.log("JSON parse error:", e);
+    }
+
+    // Safety arrays
+    const newImagesSafe = Array.isArray(newImages) ? newImages : [];
+    const newVideosSafe = Array.isArray(newVideos) ? newVideos : [];
+    const removedImagesSafe = Array.isArray(removedImages) ? removedImages : [];
+    const removedVideosSafe = Array.isArray(removedVideos) ? removedVideos : [];
+
+    // 1) Resort info update
     await Resort.findByIdAndUpdate(
       id,
       { name, description, price, location },
       { new: true }
     );
 
-    // 2) Files record авах
+    // 2) Files record
     let files = await File.findOne({ resortsId: id });
     if (!files) {
       files = new File({ resortsId: id, images: [], videos: [] });
     }
 
-    if (removedImages.length > 0) {
-      for (let url of removedImages) {
-        const publicId = extractPublicId(url);
-        console.log("Deleting image:", publicId);
-
-        if (publicId) {
-          await cloudinary.uploader.destroy(publicId);
-          console.log("Deleted image:", publicId);
-        }
+    // 3) Remove images
+    for (let url of removedImagesSafe) {
+      const publicId = extractPublicId(url);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
       }
-
-      files.images = files.images.filter(img => !removedImages.includes(img));
     }
 
-    // 4) Устгах видео
-     if (removedVideos.length > 0) {
-      for (let url of removedVideos) {
-        const publicId = extractPublicId(url);
-        console.log("Deleting video:", publicId);
+    files.images = files.images.filter(img => !removedImagesSafe.includes(img));
 
-        if (publicId) {
-          await cloudinary.uploader.destroy(publicId, {
-            resource_type: "video" });
-            console.log("Deleted video:", publicId);
-        }
+    // 4) Remove videos
+    for (let url of removedVideosSafe) {
+      const publicId = extractPublicId(url);
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId, {
+          resource_type: "video"
+        });
       }
-
-      files.videos = files.videos.filter(v => !removedVideos.includes(v));
     }
 
-    // 5) Шинэ зургууд upload хийж нэмэх
-if (newImages?.length > 0) {
-      files.images.push(...newImages);
+    files.videos = files.videos.filter(v => !removedVideosSafe.includes(v));
+
+    // 5) Add new images
+    if (newImagesSafe.length > 0) {
+      files.images.push(...newImagesSafe);
     }
 
-    // 6) Шинэ видеонууд нэмэх
-    if (newVideos?.length > 0) {
-      files.videos.push(...newVideos);
+    // 6) Add new videos
+    if (newVideosSafe.length > 0) {
+      files.videos.push(...newVideosSafe);
     }
 
-    // 7) Save
+    // Save
     await files.save();
 
     return res.json({
       success: true,
       message: "Resort амжилттай шинэчлэгдлээ",
     });
+
   } catch (err) {
     console.error("Update error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
-
 
 export const deleteResort = async (req, res) => {
   try {
