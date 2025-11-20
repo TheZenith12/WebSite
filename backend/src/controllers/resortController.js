@@ -48,9 +48,7 @@ export const getResortById = async (req, res) => {
   }
 };
 
-// --------------------------------------------------
-// ✅ CREATE Resort (Frontend direct upload → URL дамжуулна)
-// --------------------------------------------------
+
 export const createResort = async (req, res) => {
   try {
     const { name, description, price, location, images, videos } = req.body;
@@ -92,7 +90,7 @@ export const updateResort = async (req, res) => {
       removedVideos,
     } = req.body;
 
-    // Parse JSON if string
+    // FormData → string JSON бол parse хийх
     try {
       if (typeof newImages === "string") newImages = JSON.parse(newImages);
       if (typeof newVideos === "string") newVideos = JSON.parse(newVideos);
@@ -102,43 +100,31 @@ export const updateResort = async (req, res) => {
       console.log("JSON parse failed", error);
     }
 
-    // Safe fallback arrays
+    // Safety arrays
     const newImagesSafe = Array.isArray(newImages) ? newImages : [];
     const newVideosSafe = Array.isArray(newVideos) ? newVideos : [];
     const removedImagesSafe = Array.isArray(removedImages) ? removedImages : [];
     const removedVideosSafe = Array.isArray(removedVideos) ? removedVideos : [];
 
-    // Update Resort info
-    await Resort.findByIdAndUpdate(
-      id,
-      { name, description, price, location },
-      { new: true }
-    );
+    // Resort update
+    await Resort.findByIdAndUpdate(id, { name, description, price, location }, { new: true });
 
-    // Get or create File document
+    // Files document
     let files = await File.findOne({ resortsId: id });
-    if (!files) {
-      files = new File({ resortsId: id, images: [], videos: [] });
-    }
+    if (!files) files = new File({ resortsId: id, images: [], videos: [] });
 
     // Remove images
     for (let url of removedImagesSafe) {
       const publicId = extractPublicId(url);
       if (publicId) await cloudinary.uploader.destroy(publicId);
     }
-
     files.images = files.images.filter(img => !removedImagesSafe.includes(img));
 
     // Remove videos
     for (let url of removedVideosSafe) {
       const publicId = extractPublicId(url);
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId, {
-          resource_type: "video",
-        });
-      }
+      if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
     }
-
     files.videos = files.videos.filter(v => !removedVideosSafe.includes(v));
 
     // Add new images/videos
@@ -147,15 +133,14 @@ export const updateResort = async (req, res) => {
 
     await files.save();
 
-    return res.json({
-      success: true,
-      message: "Resort амжилттай шинэчлэгдлээ",
-    });
+    return res.json({ success: true, message: "Resort амжилттай шинэчлэгдлээ" });
+
   } catch (err) {
     console.error("Update error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 export const deleteResort = async (req, res) => {
   try {
