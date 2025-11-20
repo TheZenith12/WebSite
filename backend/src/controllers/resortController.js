@@ -114,17 +114,33 @@ export const updateResort = async (req, res) => {
     if (!files) files = new File({ resortsId: id, images: [], videos: [] });
 
     // Remove images
-    for (let url of removedImagesSafe) {
-      const publicId = extractPublicId(url);
-      if (publicId) await cloudinary.uploader.destroy(publicId);
+    if (Array.isArray(removedImagesSafe) && removedImagesSafe.length > 0) {
+  for (let url of removedImagesSafe) {
+    const publicId = extractPublicId(url);
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (err) {
+        console.error("Cloudinary image delete error:", err);
+      }
     }
+  }
+}
     files.images = files.images.filter(img => !removedImagesSafe.includes(img));
 
     // Remove videos
-    for (let url of removedVideosSafe) {
-      const publicId = extractPublicId(url);
-      if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+    if (Array.isArray(removedVideosSafe) && removedVideosSafe.length > 0) {
+  for (let url of removedVideosSafe) {
+    const publicId = extractPublicId(url);
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+      } catch (err) {
+        console.error("Cloudinary video delete error:", err);
+      }
     }
+  }
+}
     files.videos = files.videos.filter(v => !removedVideosSafe.includes(v));
 
     // Add new images/videos
