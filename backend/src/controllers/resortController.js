@@ -107,27 +107,21 @@ export const updateResort = async (req, res) => {
 
     if (removedImages?.length) {
       for (let url of removedImages) {
-        const publicId = extractPublicId(url);
         if (publicId) await cloudinary.uploader.destroy(publicId);
       }
+     files.images = files.images.filter(img => !removedImages.some(r => r.publicId === img.publicId));
+}
 
-      files.images = files.images.filter(
-        (img) => !removedImages.includes(img.url)
-      );
-    }
 
     // 4) Устгах видео
      // 4️⃣ Хуучин видео устгах
     if (removedVideos?.length) {
       for (let url of removedVideos) {
-        const publicId = extractPublicId(url);
         if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
       }
 
-      files.videos = files.videos.filter(
-        (v) => !removedVideos.includes(v.url)
-      );
-    }
+   files.videos = files.videos.filter(v => !removedVideos.some(r => r.publicId === v.publicId));
+}
 
     // 5) Шинэ зургууд upload хийж нэмэх
 if (newImages?.length) {
