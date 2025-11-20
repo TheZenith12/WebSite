@@ -51,16 +51,29 @@ export const getResortById = async (req, res) => {
 
 export const createResort = async (req, res) => {
   try {
-    const { name, description, price, location, images, videos } = req.body;
+    let { name, description, price, location, images, videos } = req.body;
 
+    // String JSON бол parse хийнэ
+    try {
+      if (typeof images === "string") images = JSON.parse(images);
+      if (typeof videos === "string") videos = JSON.parse(videos);
+    } catch (err) {
+      console.log("JSON parse error in createResort", err);
+    }
+
+    const imagesSafe = Array.isArray(images) ? images : [];
+    const videosSafe = Array.isArray(videos) ? videos : [];
+
+    // Resort save
     const newResort = new Resort({ name, description, price, location });
     const savedResort = await newResort.save();
 
-    if ((images?.length || 0) + (videos?.length || 0) > 0) {
+    // Files save
+    if (imagesSafe.length > 0 || videosSafe.length > 0) {
       const newFile = new File({
         resortsId: savedResort._id,
-        images: images || [],
-        videos: videos || [],
+        images: imagesSafe,
+        videos: videosSafe,
       });
       await newFile.save();
     }
@@ -70,10 +83,13 @@ export const createResort = async (req, res) => {
       message: "Resort амжилттай нэмэгдлээ",
       resort: savedResort,
     });
+
   } catch (err) {
+    console.error("Create resort error:", err);
     res.status(500).json({ message: err.message });
   }
 };
+
 
 export const updateResort = async (req, res) => {
   try {
