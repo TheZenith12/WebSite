@@ -86,10 +86,10 @@ export const updateResort = async (req, res) => {
       description,
       price,
       location,
-      newImages,
-      newVideos,
-      removedImages,
-      removedVideos,
+      newImages = [],
+      newVideos = [],
+      removedImages = [],
+      removedVideos = [],
     } = req.body;
 
     // 1) Resort update
@@ -105,31 +105,43 @@ export const updateResort = async (req, res) => {
       files = new File({ resortsId: id, images: [], videos: [] });
     }
 
-    if (removedImages?.length) {
+    if (removedImages.length > 0) {
       for (let url of removedImages) {
-        if (publicId) await cloudinary.uploader.destroy(publicId);
-      }
-     files.images = files.images.filter(img => !removedImages.some(r => r.publicId === img.publicId));
-}
+        const publicId = extractPublicId(url);
+        console.log("Deleting image:", publicId);
 
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId);
+          console.log("Deleted image:", publicId);
+        }
+      }
+
+      files.images = files.images.filter(img => !removedImages.includes(img));
+    }
 
     // 4) Устгах видео
-     // 4️⃣ Хуучин видео устгах
-    if (removedVideos?.length) {
+     if (removedVideos.length > 0) {
       for (let url of removedVideos) {
-        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+        const publicId = extractPublicId(url);
+        console.log("Deleting video:", publicId);
+
+        if (publicId) {
+          await cloudinary.uploader.destroy(publicId, {
+            resource_type: "video" });
+            console.log("Deleted video:", publicId);
+        }
       }
 
-   files.videos = files.videos.filter(v => !removedVideos.some(r => r.publicId === v.publicId));
-}
+      files.videos = files.videos.filter(v => !removedVideos.includes(v));
+    }
 
     // 5) Шинэ зургууд upload хийж нэмэх
-if (newImages?.length) {
+if (newImages?.length > 0) {
       files.images.push(...newImages);
     }
 
     // 6) Шинэ видеонууд нэмэх
-    if (newVideos?.length) {
+    if (newVideos?.length > 0) {
       files.videos.push(...newVideos);
     }
 
@@ -141,6 +153,7 @@ if (newImages?.length) {
       message: "Resort амжилттай шинэчлэгдлээ",
     });
   } catch (err) {
+    console.error("Update error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };
