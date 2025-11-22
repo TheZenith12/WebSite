@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
-import AdminLayout from './components/AdminLayout'
+import Sidebar from './components/Sidebar'
 import RequireAuth from './components/RequireAuth'
 import Login from './pages/Login'
 import Resorts from './pages/Resorts'
