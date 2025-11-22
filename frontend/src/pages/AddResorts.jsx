@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -57,24 +58,42 @@ export default function AddResort() {
     videos.forEach((vid) => formData.append("videos", vid));
 
     try {
-      await axios.post(`${API_BASE}/api/admin/resorts/new`, formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      alert("Амжилттай нэмэгдлээ!");
-
-      // Reset form
-      setForm({ name: "", description: "", price: "", location: "" });
-      setImages([]);
-      setVideos([]);
-      setPreviewUrls([]);
-    } catch (err) {
-      console.error("Алдаа:", err);
-      alert("Амралтын газар нэмэхэд алдаа гарлаа!");
-    } finally {
-      setLoading(false);
+    // CLOUDINARY upload
+    const uploadedImageUrls = [];
+    for (const img of images) {
+      const url = await uploadToCloudinary(img);
+      uploadedImageUrls.push(url);
     }
-  };
+
+    const uploadedVideoUrls = [];
+    for (const vid of videos) {
+      const url = await uploadToCloudinary(vid);
+      uploadedVideoUrls.push(url);
+    }
+
+    // BACKEND руу JSON илгээнэ
+    const payload = {
+      ...form,
+      images: uploadedImageUrls,
+      videos: uploadedVideoUrls
+    };
+
+    await axios.post(`${API_BASE}/api/admin/resorts/new`, payload);
+
+    alert("Амжилттай нэмэгдлээ!");
+
+    setForm({ name: "", description: "", price: "", location: "" });
+    setImages([]);
+    setVideos([]);
+    setPreviewUrls([]);
+
+  } catch (err) {
+    console.error("Алдаа:", err);
+    alert("Амралтын газар нэмэхэд алдаа гарлаа!");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="p-6 max-w-3xl mx-auto">

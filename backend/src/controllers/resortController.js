@@ -1,7 +1,9 @@
 import { cloudinary, extractPublicId } from "../utils/cloudinary.js";
 import File from "../models/fileModel.js";
 import Resort from "../models/resortModel.js";
+import multer from "multer";
 
+const upload = multer({ storage: multer.memoryStorage() });
 // --------------------------------------------------
 // ✅ GET ALL Resorts
 // --------------------------------------------------
@@ -53,7 +55,7 @@ export const createResort = async (req, res) => {
   try {
     let { name, description, price, location, images, videos } = req.body;
 
-    // String JSON бол parse хийнэ
+    // Хэрвээ JSON string ирвэл parse хийнэ
     try {
       if (typeof images === "string") images = JSON.parse(images);
       if (typeof videos === "string") videos = JSON.parse(videos);
@@ -61,27 +63,30 @@ export const createResort = async (req, res) => {
       console.log("JSON parse error in createResort", err);
     }
 
-    const imagesSafe = Array.isArray(images) ? images : [];
-    const videosSafe = Array.isArray(videos) ? videos : [];
+    const newResort = new Resort({
+      name,
+      description,
+      price,
+      location
+    });
 
-    // Resort save
-    const newResort = new Resort({ name, description, price, location });
     const savedResort = await newResort.save();
 
-    // Files save
-    if (imagesSafe.length > 0 || videosSafe.length > 0) {
+    // Хэрвээ зураг/видео байгаа бол File collection руу хадгална
+    if (images?.length || videos?.length) {
       const newFile = new File({
         resortsId: savedResort._id,
-        images: imagesSafe,
-        videos: videosSafe,
+        images: images || [],
+        videos: videos || []
       });
+
       await newFile.save();
     }
 
     res.status(201).json({
       success: true,
       message: "Resort амжилттай нэмэгдлээ",
-      resort: savedResort,
+      resort: savedResort
     });
 
   } catch (err) {
