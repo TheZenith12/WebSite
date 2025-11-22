@@ -53,7 +53,7 @@ export const getResortById = async (req, res) => {
 
 export const createResort = async (req, res) => {
   try {
-    let { name, description, price, location, images, videos } = req.body;
+    let { name, description, price, location, lat, lng, images, videos } = req.body;
 
     // Хэрвээ JSON string ирвэл parse хийнэ
     try {
@@ -66,8 +66,10 @@ export const createResort = async (req, res) => {
     const newResort = new Resort({
       name,
       description,
-      price,
-      location
+      location,
+      lat,
+      lng,
+      price
     });
 
     const savedResort = await newResort.save();
@@ -103,8 +105,10 @@ export const updateResort = async (req, res) => {
     let {
       name,
       description,
-      price,
       location,
+      lat,
+      lng,
+      price,
       newImages,
       newVideos,
       removedImages,

@@ -4,8 +4,16 @@ const resortSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     description: String,
-    price: Number,
     location: String,
+    lat: {
+       type: Number,
+       required: true
+      },
+    lng: {
+       type: Number,
+       required: true
+     },
+    price: Number,
 },
   { timestamps: true }
 );

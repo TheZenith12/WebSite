@@ -8,8 +8,10 @@ export default function AddResort() {
   const [form, setForm] = useState({
     name: "",
     description: "",
-    price: "",
     location: "",
+    lat: "",
+    lng: "",
+    price: "",
   });
 
   const [images, setImages] = useState([]);
@@ -51,8 +53,11 @@ export default function AddResort() {
 
     formData.append("name", form.name);
     formData.append("description", form.description);
-    formData.append("price", form.price);
     formData.append("location", form.location);
+    fromData.append("lat", form.lat);
+    formData.append("lng", form.lng);
+    formData.append("price", form.price);
+
 
     images.forEach((img) => formData.append("images", img));
     videos.forEach((vid) => formData.append("videos", vid));
@@ -82,7 +87,7 @@ export default function AddResort() {
 
     alert("Амжилттай нэмэгдлээ!");
 
-    setForm({ name: "", description: "", price: "", location: "" });
+    setForm({ name: "", description: "", location: "", lat: "", lng: "", price: "" });
     setImages([]);
     setVideos([]);
     setPreviewUrls([]);
@@ -119,11 +124,18 @@ export default function AddResort() {
           className="border w-full px-3 py-2 rounded"
         />
 
-        <input
-          name="price"
-          type="number"
-          placeholder="Үнэ"
-          value={form.price}
+        <textarea
+          name="lat"
+          placeholder="Latitude"
+          value={form.lat}
+          onChange={handleChange}
+          className="border w-full px-3 py-2 rounded"
+        />
+
+        <textarea
+          name="lng"
+          placeholder="Longitude"
+          value={form.lng}
           onChange={handleChange}
           className="border w-full px-3 py-2 rounded"
         />
@@ -136,6 +148,17 @@ export default function AddResort() {
           className="border w-full px-3 py-2 rounded"
         />
 
+
+        <input
+          name="price"
+          type="number"
+          placeholder="Үнэ"
+          value={form.price}
+          onChange={handleChange}
+          className="border w-full px-3 py-2 rounded"
+        />
+
+        
         {/* Images */}
         <div>
           <label className="font-medium">🖼️ Олон зураг сонгох</label>
