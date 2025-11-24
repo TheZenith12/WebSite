@@ -38,7 +38,7 @@ function EditResort() {
   useEffect(() => {
     const fetchResort = async () => {
       try {
-        const res = await axios.get(`${API_BASE}/api/admin/resorts/new/${id}`);
+        const res = await axios.get(`${API_BASE}/api/admin/resorts/edit/${id}`);
 
         const resort = res.data.resort;
         const files = res.data.files || [];
