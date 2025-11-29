@@ -44,70 +44,64 @@ export default function AddResort() {
     setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // 📤 Submit → BACKEND (multipart/form-data)
+  // 📤 Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
-    const formData = new FormData();
-
-    formData.append("name", form.name);
-    formData.append("description", form.description);
-    formData.append("location", form.location);
-    formData.append("lat", form.lat);
-    formData.append("lng", form.lng);
-    formData.append("price", form.price);
-
-
-    images.forEach((img) => formData.append("images", img));
-    videos.forEach((vid) => formData.append("videos", vid));
-
     try {
-    // CLOUDINARY upload
-    const uploadedImageUrls = [];
-    for (const img of images) {
-      const url = await uploadToCloudinary(img);
-      uploadedImageUrls.push(url);
+      // CLOUDINARY upload — Images
+      const uploadedImageUrls = [];
+      for (const img of images) {
+        const url = await uploadToCloudinary(img);
+        uploadedImageUrls.push(url);
+      }
+
+      // CLOUDINARY upload — Videos
+      const uploadedVideoUrls = [];
+      for (const vid of videos) {
+        const url = await uploadToCloudinary(vid);
+        uploadedVideoUrls.push(url);
+      }
+
+      // Backend руу JSON илгээх
+      const payload = {
+        ...form,
+        images: uploadedImageUrls,
+        videos: uploadedVideoUrls,
+      };
+
+      await axios.post(`${API_BASE}/api/admin/resorts/new`, payload);
+
+      alert("Амжилттай нэмэгдлээ!");
+
+      // Reset
+      setForm({
+        name: "",
+        description: "",
+        location: "",
+        lat: "",
+        lng: "",
+        price: "",
+      });
+      setImages([]);
+      setVideos([]);
+      setPreviewUrls([]);
+
+    } catch (err) {
+      console.error("Алдаа:", err);
+      alert("Амралтын газар нэмэхэд алдаа гарлаа!");
+    } finally {
+      setLoading(false);
     }
-
-    const uploadedVideoUrls = [];
-    for (const vid of videos) {
-      const url = await uploadToCloudinary(vid);
-      uploadedVideoUrls.push(url);
-    }
-
-    // BACKEND руу JSON илгээнэ
-    const payload = {
-      ...form,
-      images: uploadedImageUrls,
-      videos: uploadedVideoUrls
-    };
-
-    await axios.post(`${API_BASE}/api/admin/resorts/new`, payload);
-
-    alert("Амжилттай нэмэгдлээ!");
-
-    setForm({ name: "", description: "", location: "", lat: "", lng: "", price: "" });
-    setImages([]);
-    setVideos([]);
-    setPreviewUrls([]);
-
-  } catch (err) {
-    console.error("Алдаа:", err);
-    alert("Амралтын газар нэмэхэд алдаа гарлаа!");
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
       <h2 className="text-2xl font-semibold mb-4">Амралтын газар нэмэх</h2>
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-4 bg-white p-4 rounded shadow"
-      >
+      <form onSubmit={handleSubmit} className="space-y-4 bg-white p-4 rounded shadow">
+
         <input
           name="name"
           placeholder="Нэр"
@@ -148,7 +142,6 @@ export default function AddResort() {
           className="border w-full px-3 py-2 rounded"
         />
 
-
         <input
           name="price"
           type="number"
@@ -158,7 +151,6 @@ export default function AddResort() {
           className="border w-full px-3 py-2 rounded"
         />
 
-        
         {/* Images */}
         <div>
           <label className="font-medium">🖼️ Олон зураг сонгох</label>
@@ -200,4 +192,4 @@ export default function AddResort() {
       </form>
     </div>
   );
-}  
+}
