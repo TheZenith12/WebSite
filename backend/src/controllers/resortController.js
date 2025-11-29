@@ -55,7 +55,7 @@ export const createResort = async (req, res) => {
   try {
     let { name, description, price, location, lat, lng, images, videos } = req.body;
 
-    // Хэрвээ JSON string ирвэл parse хийнэ
+    // Хэрвээ string JSON ирвэл parse хийнэ
     try {
       if (typeof images === "string") images = JSON.parse(images);
       if (typeof videos === "string") videos = JSON.parse(videos);
@@ -63,37 +63,35 @@ export const createResort = async (req, res) => {
       console.log("JSON parse error in createResort", err);
     }
 
-    const newResort = new Resort({
+    // Resort үндсэн мэдээлэл хадгалах
+    const newResort = await Resort.create({
       name,
       description,
       location,
       lat,
       lng,
-      price
+      price,
     });
 
-    const savedResort = await newResort.save();
+    // File model үүсгэх
+    const newFiles = new File({
+      resortsId: newResort._id,
+      images: Array.isArray(images) ? images : [],
+      videos: Array.isArray(videos) ? videos : [],
+    });
 
-    // Хэрвээ зураг/видео байгаа бол File collection руу хадгална
-    if (images?.length || videos?.length) {
-      const newFile = new File({
-        resortsId: savedResort._id,
-        images: images || [],
-        videos: videos || []
-      });
+    await newFiles.save();
 
-      await newFile.save();
-    }
-
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Resort амжилттай нэмэгдлээ",
-      resort: savedResort
+      resort: newResort,
+      files: newFiles,
     });
 
   } catch (err) {
     console.error("Create resort error:", err);
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
