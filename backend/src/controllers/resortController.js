@@ -53,15 +53,24 @@ export const getResortById = async (req, res) => {
 
 export const createResort = async (req, res) => {
   try {
+    console.log("createResort body:", req.body);
+
     let { name, description, price, location, lat, lng, images, videos } = req.body;
 
-    // Хэрвээ string JSON ирвэл parse хийнэ
+    // JSON string ирвэл parse хийнэ
     try {
       if (typeof images === "string") images = JSON.parse(images);
       if (typeof videos === "string") videos = JSON.parse(videos);
     } catch (err) {
       console.log("JSON parse error in createResort", err);
     }
+
+    // Basic validation
+    if (!name) return res.status(400).json({ success: false, message: "Name is required" });
+
+    // lat/lng-ийг Number-т хувиргах
+    lat = lat !== undefined && lat !== "" ? parseFloat(lat) : undefined;
+    lng = lng !== undefined && lng !== "" ? parseFloat(lng) : undefined;
 
     // Resort үндсэн мэдээлэл хадгалах
     const newResort = await Resort.create({
@@ -73,9 +82,9 @@ export const createResort = async (req, res) => {
       price,
     });
 
-    // File model үүсгэх
+    // File model — Field нэрсийг тодорхойлох (resortId гэж нэрлэхийг санал)
     const newFiles = new File({
-      resortsId: newResort._id,
+      resortId: newResort._id,     // <- өмнө нь resortsId байсан бол бусад кодтой зөрөх магадлалтай
       images: Array.isArray(images) ? images : [],
       videos: Array.isArray(videos) ? videos : [],
     });
@@ -88,7 +97,6 @@ export const createResort = async (req, res) => {
       resort: newResort,
       files: newFiles,
     });
-
   } catch (err) {
     console.error("Create resort error:", err);
     return res.status(500).json({ success: false, message: err.message });
