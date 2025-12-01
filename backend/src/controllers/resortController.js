@@ -138,7 +138,7 @@ export const updateResort = async (req, res) => {
     const removedVideosSafe = Array.isArray(removedVideos) ? removedVideos : [];
 
     // Resort update
-    await Resort.findByIdAndUpdate(id, { name, description, price, location }, { new: true });
+    await Resort.findByIdAndUpdate(id, { name, description, price, location, lat, lng }, { new: true });
 
     // Files document
     let files = await File.findOne({ resortsId: id });
