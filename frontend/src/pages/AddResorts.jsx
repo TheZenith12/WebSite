@@ -85,7 +85,7 @@ const handleSubmit = async (e) => {
     };
 
     // Зарим API-үүд JSON string-аар хүлээдэг тул шаардлагатай бол stringify хийгээд явуулж болно.
-    await axios.post(`${API_BASE.replace(/\/$/, "")}/api/admin/resorts/new`, payload);
+    await axios.post(`${API_BASE}/api/admin/resorts/new`, payload);
 
     alert("Амжилттай нэмэгдлээ!");
 
