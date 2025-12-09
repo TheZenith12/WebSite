@@ -57,8 +57,13 @@ export const createResort = async (req, res) => {
 
     // images/videos JSON parse
     try {
-      if (typeof images === "string") images = JSON.parse(images);
-      if (typeof videos === "string") videos = JSON.parse(videos);
+      if (typeof images === "string") {
+  try { images = JSON.parse(images); } catch {}
+}
+if (typeof videos === "string") {
+  try { videos = JSON.parse(videos); } catch {}
+}
+
     } catch (err) {
       console.log("JSON parse error:", err);
     }
