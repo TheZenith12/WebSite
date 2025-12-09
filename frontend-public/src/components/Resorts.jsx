@@ -288,14 +288,6 @@ function Resorts() {
               <div className="text-3xl font-bold text-emerald-600 mb-6">
                 {selectedResort.price ? `${parseInt(selectedResort.price).toLocaleString()}₮` : "—"} / хоног
               </div>
-
-              <Link
-                to={`/details/${selectedResort._id}`}
-                className="block w-full text-center bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-4 rounded-full font-bold text-lg hover:shadow-xl transition-all"
-                onClick={() => setSelectedResort(null)}
-              >
-                Захиалга өгөх
-              </Link>
             </div>
           </div>
         </div>
