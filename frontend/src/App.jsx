@@ -1,7 +1,6 @@
 import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Sidebar from './components/Sidebar'
-import Topbar from './components/Topbar'
 import RequireAuth from './components/RequireAuth'
 import Login from './pages/Login'
 import Resorts from './pages/Resorts'
@@ -16,7 +15,6 @@ function App() {
   <div className="min-h-screen flex bg-gray-50">
     {auth.isLoggedIn() && <Sidebar />}
     <div className="flex-1 flex flex-col">
-      {auth.isLoggedIn() && <Topbar />}
       <main className="p-6">
         <Routes>
           <Route path="/" element={<Login />} />

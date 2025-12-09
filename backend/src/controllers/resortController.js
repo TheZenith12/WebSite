@@ -1,9 +1,11 @@
 import { cloudinary, extractPublicId } from "../utils/cloudinary.js";
 import File from "../models/fileModel.js";
 import Resort from "../models/resortModel.js";
+import multer from "multer";
 
+const upload = multer({ storage: multer.memoryStorage() });
 // --------------------------------------------------
-// ✅ GET ALL Resorts
+// ✅ GET ALL Resortsfqdx
 // --------------------------------------------------
 export const getResorts = async (req, res) => {
   try {
@@ -48,101 +50,153 @@ export const getResortById = async (req, res) => {
   }
 };
 
-// --------------------------------------------------
-// ✅ CREATE Resort (Frontend direct upload → URL дамжуулна)
-// --------------------------------------------------
+
 export const createResort = async (req, res) => {
   try {
-    const { name, description, price, location, images, videos } = req.body;
+    let { name, description, price, location, lat, lng, images, videos } = req.body;
 
-    const newResort = new Resort({ name, description, price, location });
-    const savedResort = await newResort.save();
-
-    if ((images?.length || 0) + (videos?.length || 0) > 0) {
-      const newFile = new File({
-        resortsId: savedResort._id,
-        images: images || [],
-        videos: videos || [],
-      });
-      await newFile.save();
+    // images/videos JSON parse
+    try {
+      if (typeof images === "string") images = JSON.parse(images);
+      if (typeof videos === "string") videos = JSON.parse(videos);
+    } catch (err) {
+      console.log("JSON parse error:", err);
     }
 
-    res.status(201).json({
-      success: true,
-      message: "Resort амжилттай нэмэгдлээ",
-      resort: savedResort,
+    if (!name) {
+      return res.status(400).json({ success: false, message: "Name is required" });
+    }
+
+    // 💥 lat/lng required тул энд шалгана
+    if (!lat || !lng) {
+      return res.status(400).json({
+        success: false,
+        message: "Latitude (lat) болон Longitude (lng) хоёул шаардлагатай!",
+      });
+    }
+
+    const parsedLat = parseFloat(lat);
+    const parsedLng = parseFloat(lng);
+
+    if (isNaN(parsedLat) || isNaN(parsedLng)) {
+      return res.status(400).json({
+        success: false,
+        message: "lat/lng нь тоо байх ёстой!",
+      });
+    }
+
+    // Resort save
+    const newResort = await Resort.create({
+      name,
+      description,
+      location,
+      lat: parsedLat,
+      lng: parsedLng,
+      price,
     });
+
+    // File save
+    const newFiles = new File({
+      resortId: newResort._id,
+      images: Array.isArray(images) ? images : [],
+      videos: Array.isArray(videos) ? videos : [],
+    });
+
+    await newFiles.save();
+
+    return res.status(201).json({
+      success: true,
+      resort: newResort,
+      files: newFiles,
+    });
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Create resort error:", err);
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const {
+    let {
       name,
       description,
-      price,
       location,
+      lat,
+      lng,
+      price,
       newImages,
       newVideos,
       removedImages,
       removedVideos,
     } = req.body;
 
-    // 1) Resort update
-    await Resort.findByIdAndUpdate(
-      id,
-      { name, description, price, location },
-      { new: true }
-    );
+    // FormData → string JSON бол parse хийх
+    try {
+      if (typeof newImages === "string") newImages = JSON.parse(newImages);
+      if (typeof newVideos === "string") newVideos = JSON.parse(newVideos);
+      if (typeof removedImages === "string") removedImages = JSON.parse(removedImages);
+      if (typeof removedVideos === "string") removedVideos = JSON.parse(removedVideos);
+    } catch (error) {
+      console.log("JSON parse failed", error);
+    }
 
-    // 2) Files record авах
+    // Safety arrays
+    const newImagesSafe = Array.isArray(newImages) ? newImages : [];
+    const newVideosSafe = Array.isArray(newVideos) ? newVideos : [];
+    const removedImagesSafe = Array.isArray(removedImages) ? removedImages : [];
+    const removedVideosSafe = Array.isArray(removedVideos) ? removedVideos : [];
+
+    // Resort update
+    await Resort.findByIdAndUpdate(id, { name, description, price, location, lat, lng }, { new: true });
+
+    // Files document
     let files = await File.findOne({ resortsId: id });
-    if (!files) {
-      files = new File({ resortsId: id, images: [], videos: [] });
-    }
+    if (!files) files = new File({ resortsId: id, images: [], videos: [] });
 
-    // 3) Устгах зураг
-    if (removedImages?.length) {
-      for (let url of removedImages) {
-        const publicId = extractPublicId(url);
-        if (publicId) await cloudinary.uploader.destroy(publicId);
+    // Remove images
+    if (Array.isArray(removedImagesSafe) && removedImagesSafe.length > 0) {
+  for (let url of removedImagesSafe) {
+    const publicId = extractPublicId(url);
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId);
+      } catch (err) {
+        console.error("Cloudinary image delete error:", err);
       }
-
-      files.images = files.images.filter((img) => !removedImages.includes(img));
     }
+  }
+}
+    files.images = files.images.filter(img => !removedImagesSafe.includes(img));
 
-    // 4) Устгах видео
-    if (removedVideos?.length) {
-      for (let url of removedVideos) {
-        const publicId = extractPublicId(url);
-        if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+    // Remove videos
+    if (Array.isArray(removedVideosSafe) && removedVideosSafe.length > 0) {
+  for (let url of removedVideosSafe) {
+    const publicId = extractPublicId(url);
+    if (publicId) {
+      try {
+        await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+      } catch (err) {
+        console.error("Cloudinary video delete error:", err);
       }
-
-      files.videos = files.videos.filter((v) => !removedVideos.includes(v));
     }
+  }
+}
+    files.videos = files.videos.filter(v => !removedVideosSafe.includes(v));
 
-    // 5) Шинэ зургууд нэмэх
-    if (newImages?.length) {
-      files.images.push(...newImages);
-    }
+    // Add new images/videos
+    if (newImagesSafe.length > 0) files.images.push(...newImagesSafe);
+    if (newVideosSafe.length > 0) files.videos.push(...newVideosSafe);
 
-    // 6) Шинэ видеонууд нэмэх
-    if (newVideos?.length) {
-      files.videos.push(...newVideos);
-    }
-
-    // 7) Save
     await files.save();
 
-    return res.json({
-      success: true,
-      message: "Resort амжилттай шинэчлэгдлээ",
-    });
+    return res.json({ success: true, message: "Resort амжилттай шинэчлэгдлээ" });
+
   } catch (err) {
+    console.error("Update error:", err);
     return res.status(500).json({ success: false, message: err.message });
   }
 };

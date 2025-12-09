@@ -176,7 +176,9 @@ function EditResort() {
         <textarea name="description" value={form.description} onChange={handleChange} className="border w-full p-2 rounded" />
         <input type="number" name="price" value={form.price} onChange={handleChange} className="border w-full p-2 rounded" />
         <input type="text" name="location" value={form.location} onChange={handleChange} className="border w-full p-2 rounded" />
-
+        <input type="text" name="lng" value={form.lng} onChange={handleChange} className="border w-full p-2 rounded" />
+        <input type="text" name="lat" value={form.lat} onChange={handleChange} className="border w-full p-2 rounded" />
+        
         {/* EXISTING IMAGES */}
         <h3 className="font-medium">Одоо байгаа зургууд</h3>
         <div className="flex flex-wrap gap-2">
