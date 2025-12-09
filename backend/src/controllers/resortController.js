@@ -53,27 +53,39 @@ export const getResortById = async (req, res) => {
 
 export const createResort = async (req, res) => {
   try {
-    console.log("createResort body:", req.body);
-
     let { name, description, price, location, lat, lng, images, videos } = req.body;
 
-    // JSON parse
+    // images/videos JSON parse
     try {
       if (typeof images === "string") images = JSON.parse(images);
       if (typeof videos === "string") videos = JSON.parse(videos);
     } catch (err) {
-      console.log("JSON parse error in createResort", err);
+      console.log("JSON parse error:", err);
     }
 
     if (!name) {
       return res.status(400).json({ success: false, message: "Name is required" });
     }
 
-    // lat/lng parse
-    const parsedLat = lat ? parseFloat(lat) : undefined;
-    const parsedLng = lng ? parseFloat(lng) : undefined;
+    // 💥 lat/lng required тул энд шалгана
+    if (!lat || !lng) {
+      return res.status(400).json({
+        success: false,
+        message: "Latitude (lat) болон Longitude (lng) хоёул шаардлагатай!",
+      });
+    }
 
-    // Resort create
+    const parsedLat = parseFloat(lat);
+    const parsedLng = parseFloat(lng);
+
+    if (isNaN(parsedLat) || isNaN(parsedLng)) {
+      return res.status(400).json({
+        success: false,
+        message: "lat/lng нь тоо байх ёстой!",
+      });
+    }
+
+    // Resort save
     const newResort = await Resort.create({
       name,
       description,
@@ -83,7 +95,7 @@ export const createResort = async (req, res) => {
       price,
     });
 
-    // File create
+    // File save
     const newFiles = new File({
       resortId: newResort._id,
       images: Array.isArray(images) ? images : [],
@@ -94,16 +106,13 @@ export const createResort = async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "Resort амжилттай нэмэгдлээ",
       resort: newResort,
       files: newFiles,
     });
+
   } catch (err) {
     console.error("Create resort error:", err);
-    return res.status(500).json({
-      success: false,
-      message: err.message,
-    });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
