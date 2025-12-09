@@ -5,7 +5,7 @@ import multer from "multer";
 
 const upload = multer({ storage: multer.memoryStorage() });
 // --------------------------------------------------
-// ✅ GET ALL Resorts
+// ✅ GET ALL Resortsfqdx
 // --------------------------------------------------
 export const getResorts = async (req, res) => {
   try {
@@ -57,7 +57,7 @@ export const createResort = async (req, res) => {
 
     let { name, description, price, location, lat, lng, images, videos } = req.body;
 
-    // JSON string ирвэл parse хийнэ
+    // JSON parse
     try {
       if (typeof images === "string") images = JSON.parse(images);
       if (typeof videos === "string") videos = JSON.parse(videos);
@@ -65,26 +65,27 @@ export const createResort = async (req, res) => {
       console.log("JSON parse error in createResort", err);
     }
 
-    // Basic validation
-    if (!name) return res.status(400).json({ success: false, message: "Name is required" });
+    if (!name) {
+      return res.status(400).json({ success: false, message: "Name is required" });
+    }
 
-    // lat/lng-ийг Number-т хувиргах
-    lat = lat !== undefined && lat !== "" ? parseFloat(lat) : undefined;
-    lng = lng !== undefined && lng !== "" ? parseFloat(lng) : undefined;
+    // lat/lng parse
+    const parsedLat = lat ? parseFloat(lat) : undefined;
+    const parsedLng = lng ? parseFloat(lng) : undefined;
 
-    // Resort үндсэн мэдээлэл хадгалах
+    // Resort create
     const newResort = await Resort.create({
       name,
       description,
       location,
-      lat,
-      lng,
+      lat: parsedLat,
+      lng: parsedLng,
       price,
     });
 
-    // File model — Field нэрсийг тодорхойлох (resortId гэж нэрлэхийг санал)
+    // File create
     const newFiles = new File({
-      resortId: newResort._id,     // <- өмнө нь resortsId байсан бол бусад кодтой зөрөх магадлалтай
+      resortId: newResort._id,
       images: Array.isArray(images) ? images : [],
       videos: Array.isArray(videos) ? videos : [],
     });
@@ -99,7 +100,10 @@ export const createResort = async (req, res) => {
     });
   } catch (err) {
     console.error("Create resort error:", err);
-    return res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({
+      success: false,
+      message: err.message,
+    });
   }
 };
 
