@@ -213,9 +213,13 @@ function Resorts() {
                     </div>
                   </div>
 
-                  <button className="w-full mt-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all">
+                 <Link
+                    to={`/details/${resort.id}`}
+                    className="w-full block mt-4 bg-gradient-to-r from-emerald-500 to-teal-500 text-white py-3 rounded-full font-semibold hover:shadow-lg hover:scale-105 transition-all text-center"
+                  >
                     Дэлгэрэнгүй үзэх
-                  </button>
+                  </Link>
+
                 </div>
               </article>
             ))}
