@@ -16,45 +16,56 @@ function Resorts() {
   const [selectedResort, setSelectedResort] = useState(null);
 
   // 🏕️ Амралтын газруудыг танай backend-ээс авах
-  async function fetchResorts() {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/resorts`);
-      const data = await res.json();
+ async function fetchResorts() {
+  setLoading(true);
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/resorts`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      const resorts = (data.resorts || data).map((r) => {
-        // 🖼️ Зургийн логик
-        let imgSrc = "";
-        if (Array.isArray(r.image)) {
-          imgSrc = r.image[0];
-        } else if (typeof r.image === "string") {
-          imgSrc = r.image;
-        } else if (r.image && typeof r.image === "object") {
-          imgSrc = r.image.url || r.image.path || Object.values(r.image)[0];
-        }
-
-        const fullImg = imgSrc
-          ? /^https?:\/\//i.test(imgSrc)
-            ? imgSrc
-            : `${API_BASE}${imgSrc.startsWith("/") ? imgSrc : `/${imgSrc}`}`
-          : "/no-image.png";
-
-        return {
-          ...r,
-          image: fullImg,
-          rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
-          visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
-          location: r.location || "Монгол"
-        };
-      });
-
-      setList(resorts);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error("Серверээс алдаа ирлээ: " + res.status);
     }
+
+    const data = await res.json();
+    console.log("Fetched resorts:", data);
+
+    const resorts = (data.resorts || data).map((r) => {
+      let imgSrc = "";
+
+      if (Array.isArray(r.image)) {
+        imgSrc = r.image[0];
+      } else if (typeof r.image === "string") {
+        imgSrc = r.image;
+      } else if (r.image && typeof r.image === "object") {
+        imgSrc = r.image.url || r.image.path || Object.values(r.image)[0];
+      }
+
+      const fullImg = imgSrc
+        ? /^https?:\/\//i.test(imgSrc)
+          ? imgSrc
+          : `${API_BASE}${imgSrc.startsWith("/") ? imgSrc : `/${imgSrc}`}`
+        : "/no-image.png";
+
+      return {
+        ...r,
+        image: fullImg,
+        rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
+        visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
+        location: r.location || "Монгол",
+      };
+    });
+
+    setList(resorts);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setError(err.message);
+  } finally {
+    setLoading(false);
   }
+}
 
   useEffect(() => {
     fetchResorts();

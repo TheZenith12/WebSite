@@ -3,8 +3,6 @@ import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
 
 export default defineConfig({
-  base: "/",
-  root: ".", // ⚠️ заавал нэмээрэй!
   plugins: [
     react(),
     VitePWA({
@@ -12,4 +10,14 @@ export default defineConfig({
       includeAssets: ["favicon.ico", "icons/*.png"],
     }),
   ],
+
+  server: {
+    proxy: {
+      "/api": {
+        target: "https://amaraltws-backend.vercel.app",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
 });
