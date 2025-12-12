@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const fileSchema = new mongoose.Schema(
   {
-    resortsId: {
+    resortId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Resort",
       required: true,

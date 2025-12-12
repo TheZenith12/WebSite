@@ -48,6 +48,8 @@ function EditResort() {
           description: resort.description,
           price: resort.price,
           location: resort.location,
+          lat: resort.lat,
+          lng: resort.lng,
         });
 
         setExistingImages(files.flatMap((f) => f.images || []));
