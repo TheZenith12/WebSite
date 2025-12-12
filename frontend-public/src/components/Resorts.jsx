@@ -47,7 +47,7 @@ function Resorts() {
         ? /^https?:\/\//i.test(imgSrc)
           ? imgSrc
           : `${API_BASE}${imgSrc.startsWith("/") ? imgSrc : `/${imgSrc}`}`
-        : "/no-image.png";
+        : "/";
 
       return {
         ...r,
@@ -168,7 +168,7 @@ function Resorts() {
                     src={resort.image}
                     alt={resort.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    onError={(e) => (e.currentTarget.src = "/no-image.png")}
+                    onError={(e) => (e.currentTarget.src = "/")}
                   />
                   
                   {/* Таалагдсан товч */}
