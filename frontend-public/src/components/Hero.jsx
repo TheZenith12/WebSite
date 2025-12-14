@@ -12,29 +12,8 @@ function Hero({ searchTerm, setSearchTerm }) {
           <p className="text-xl text-gray-700 mb-8">
             Байгаль, тайван амралт, тохилог байр таныг хүлээж байна
           </p>
-          
-         
-          <div className="max-w-2xl mx-auto">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Амралтын газар хайх...                                                                                🔍"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-6 py-4 rounded-full border-2 border-emerald-200 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-200 outline-none text-lg shadow-lg transition-all"
-              />
-              {searchTerm && (
-                <button
-                  onClick={() => setSearchTerm('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  ✖
-                </button>
-              )}
             </div>
           </div>
-        </div>
-      </div>
     </section>
   );
 }
