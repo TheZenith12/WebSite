@@ -12,6 +12,8 @@ function Hero({ searchTerm, setSearchTerm }) {
           <p className="text-xl text-gray-700 mb-8">
             Байгаль, тайван амралт, тохилог байр таныг хүлээж байна
           </p>
+          
+         
           <div className="max-w-2xl mx-auto">
             <div className="relative">
               <input
