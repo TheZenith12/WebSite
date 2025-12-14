@@ -125,11 +125,6 @@ function Resorts() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
-      {/* Header */}
-      <Header totalResorts={list.length} />
-
-      {/* Hero Section */}
-      <Hero />
 
       {/* Resorts Grid */}
       <div className="container mx-auto px-6 py-12">
