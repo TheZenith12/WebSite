@@ -8,21 +8,11 @@ function App() {
   const [stats, setStats] = useState({ visitors: 0, count: 0 });
 
   return (
-    <div className="min-h-screen">
-      <Header 
-        totalVisitors={stats.visitors} 
-        totalResorts={stats.count} 
-      />
-      <Hero 
-        searchTerm={searchTerm} 
-        setSearchTerm={setSearchTerm} 
-      />
       <Resorts 
         searchTerm={searchTerm} 
         setSearchTerm={setSearchTerm}
         onStatsUpdate={setStats}
       />
-    </div>
   );
 }
 
