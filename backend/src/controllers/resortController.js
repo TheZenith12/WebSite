@@ -139,70 +139,64 @@ export const updateResort = async (req, res) => {
       removedVideos,
     } = req.body;
 
-    // FormData → string JSON бол parse хийх
-    try {
-      if (typeof newImages === "string") newImages = JSON.parse(newImages);
-      if (typeof newVideos === "string") newVideos = JSON.parse(newVideos);
-      if (typeof removedImages === "string") removedImages = JSON.parse(removedImages);
-      if (typeof removedVideos === "string") removedVideos = JSON.parse(removedVideos);
-    } catch (error) {
-      console.log("JSON parse failed", error);
-    }
+    // Parse JSON strings
+    if (typeof newImages === "string") newImages = JSON.parse(newImages);
+    if (typeof newVideos === "string") newVideos = JSON.parse(newVideos);
+    if (typeof removedImages === "string") removedImages = JSON.parse(removedImages);
+    if (typeof removedVideos === "string") removedVideos = JSON.parse(removedVideos);
 
-    // Safety arrays
     const newImagesSafe = Array.isArray(newImages) ? newImages : [];
     const newVideosSafe = Array.isArray(newVideos) ? newVideos : [];
     const removedImagesSafe = Array.isArray(removedImages) ? removedImages : [];
     const removedVideosSafe = Array.isArray(removedVideos) ? removedVideos : [];
 
-    // Resort update
-    await Resort.findByIdAndUpdate(id, { name, description, price, location, lat, lng }, { new: true });
+    // Number cast
+    price = price !== "" && price !== undefined ? Number(price) : undefined;
+    lat = lat !== "" && lat !== undefined ? Number(lat) : undefined;
+    lng = lng !== "" && lng !== undefined ? Number(lng) : undefined;
 
-    // Files document
+    const updateData = {};
+    if (name) updateData.name = name;
+    if (description) updateData.description = description;
+    if (location) updateData.location = location;
+    if (price !== undefined) updateData.price = price;
+    if (lat !== undefined) updateData.lat = lat;
+    if (lng !== undefined) updateData.lng = lng;
+
+    const resort = await Resort.findByIdAndUpdate(id, updateData, { new: true });
+    if (!resort) {
+      return res.status(404).json({ success: false, message: "Resort олдсонгүй" });
+    }
+
     let files = await File.findOne({ resortsId: id });
     if (!files) files = new File({ resortsId: id, images: [], videos: [] });
 
+    files.images = Array.isArray(files.images) ? files.images : [];
+    files.videos = Array.isArray(files.videos) ? files.videos : [];
+
     // Remove images
-    if (Array.isArray(removedImagesSafe) && removedImagesSafe.length > 0) {
-  for (let url of removedImagesSafe) {
-    const publicId = extractPublicId(url);
-    if (publicId) {
-      try {
-        await cloudinary.uploader.destroy(publicId);
-      } catch (err) {
-        console.error("Cloudinary image delete error:", err);
-      }
+    for (const url of removedImagesSafe) {
+      const publicId = extractPublicId(url);
+      if (publicId) await cloudinary.uploader.destroy(publicId);
     }
-  }
-}
     files.images = files.images.filter(img => !removedImagesSafe.includes(img));
 
     // Remove videos
-    if (Array.isArray(removedVideosSafe) && removedVideosSafe.length > 0) {
-  for (let url of removedVideosSafe) {
-    const publicId = extractPublicId(url);
-    if (publicId) {
-      try {
-        await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
-      } catch (err) {
-        console.error("Cloudinary video delete error:", err);
-      }
+    for (const url of removedVideosSafe) {
+      const publicId = extractPublicId(url);
+      if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
     }
-  }
-}
     files.videos = files.videos.filter(v => !removedVideosSafe.includes(v));
 
-    // Add new images/videos
-    if (newImagesSafe.length > 0) files.images.push(...newImagesSafe);
-    if (newVideosSafe.length > 0) files.videos.push(...newVideosSafe);
+    if (newImagesSafe.length) files.images.push(...newImagesSafe);
+    if (newVideosSafe.length) files.videos.push(...newVideosSafe);
 
     await files.save();
 
-    return res.json({ success: true, message: "Resort амжилттай шинэчлэгдлээ" });
-
+    res.json({ success: true, message: "Resort амжилттай шинэчлэгдлээ" });
   } catch (err) {
-    console.error("Update error:", err);
-    return res.status(500).json({ success: false, message: err.message });
+    console.error("UPDATE RESORT ERROR ❌", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
 
