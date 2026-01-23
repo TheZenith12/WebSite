@@ -125,84 +125,103 @@ export const updateResort = async (req, res) => {
     let {
       name,
       description,
+      price,
       location,
       lat,
       lng,
-      price,
       newImages,
       newVideos,
       removedImages,
       removedVideos,
     } = req.body;
 
-    // Parse JSON strings
-    if (typeof newImages === "string") newImages = JSON.parse(newImages);
-    if (typeof newVideos === "string") newVideos = JSON.parse(newVideos);
-    if (typeof removedImages === "string") removedImages = JSON.parse(removedImages);
-    if (typeof removedVideos === "string") removedVideos = JSON.parse(removedVideos);
+    // ---------- JSON parse (add шиг) ----------
+    try {
+      if (typeof newImages === "string") newImages = JSON.parse(newImages);
+      if (typeof newVideos === "string") newVideos = JSON.parse(newVideos);
+      if (typeof removedImages === "string") removedImages = JSON.parse(removedImages);
+      if (typeof removedVideos === "string") removedVideos = JSON.parse(removedVideos);
+    } catch (e) {
+      console.log("JSON parse error:", e);
+    }
 
-    const newImagesSafe = Array.isArray(newImages) ? newImages : [];
-    const newVideosSafe = Array.isArray(newVideos) ? newVideos : [];
-    const removedImagesSafe = Array.isArray(removedImages) ? removedImages : [];
-    const removedVideosSafe = Array.isArray(removedVideos) ? removedVideos : [];
+    newImages = Array.isArray(newImages) ? newImages : [];
+    newVideos = Array.isArray(newVideos) ? newVideos : [];
+    removedImages = Array.isArray(removedImages) ? removedImages : [];
+    removedVideos = Array.isArray(removedVideos) ? removedVideos : [];
 
-    // Number cast
-    price = price !== "" && price !== undefined ? Number(price) : undefined;
-    lat = lat !== "" && lat !== undefined ? Number(lat) : undefined;
-    lng = lng !== "" && lng !== undefined ? Number(lng) : undefined;
-
-    const updateData = {};
-    if (name) updateData.name = name;
-    if (description) updateData.description = description;
-    if (location) updateData.location = location;
-    if (price !== undefined) updateData.price = price;
-    if (lat !== undefined) updateData.lat = lat;
-    if (lng !== undefined) updateData.lng = lng;
-
-    const resort = await Resort.findByIdAndUpdate(id, updateData, { new: true });
+    // ---------- Resort fetch ----------
+    const resort = await Resort.findById(id);
     if (!resort) {
-  return res.status(404).json({ message: "Resort not found" });
-}
+      return res.status(404).json({ success: false, message: "Resort not found" });
+    }
 
-if (images && images.length > 0) {
-  resort.images = [...resort.images, ...images];
-}
+    // ---------- lat/lng (add шиг шалгалт) ----------
+    if (lat !== undefined && lng !== undefined) {
+      const parsedLat = parseFloat(lat);
+      const parsedLng = parseFloat(lng);
 
-if (videos && videos.length > 0) {
-  resort.videos = [...resort.videos, ...videos];
-}
+      if (isNaN(parsedLat) || isNaN(parsedLng)) {
+        return res.status(400).json({
+          success: false,
+          message: "lat/lng нь тоо байх ёстой!",
+        });
+      }
 
-await resort.save();
+      resort.lat = parsedLat;
+      resort.lng = parsedLng;
+    }
 
-    let files = await File.findOne({ resortsId: id });
-    if (!files) files = new File({ resortsId: id, images: [], videos: [] });
+    // ---------- basic fields ----------
+    if (name) resort.name = name;
+    if (description) resort.description = description;
+    if (location) resort.location = location;
+    if (price !== undefined) resort.price = Number(price);
 
-    files.images = Array.isArray(files.images) ? files.images : [];
-    files.videos = Array.isArray(files.videos) ? files.videos : [];
+    await resort.save();
+
+    // ---------- File logic (add шиг) ----------
+    let files = await File.findOne({ resortId: id });
+    if (!files) {
+      files = new File({
+        resortId: id,
+        images: [],
+        videos: [],
+      });
+    }
 
     // Remove images
-    for (const url of removedImagesSafe) {
+    for (const url of removedImages) {
       const publicId = extractPublicId(url);
       if (publicId) await cloudinary.uploader.destroy(publicId);
     }
-    files.images = files.images.filter(img => !removedImagesSafe.includes(img));
+    files.images = files.images.filter(img => !removedImages.includes(img));
 
     // Remove videos
-    for (const url of removedVideosSafe) {
+    for (const url of removedVideos) {
       const publicId = extractPublicId(url);
-      if (publicId) await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
+      }
     }
-    files.videos = files.videos.filter(v => !removedVideosSafe.includes(v));
+    files.videos = files.videos.filter(v => !removedVideos.includes(v));
 
-    if (newImagesSafe.length) files.images.push(...newImagesSafe);
-    if (newVideosSafe.length) files.videos.push(...newVideosSafe);
+    // Add new files
+    if (newImages.length) files.images.push(...newImages);
+    if (newVideos.length) files.videos.push(...newVideos);
 
     await files.save();
 
-    res.json({ success: true, message: "Resort амжилттай шинэчлэгдлээ" });
+    return res.json({
+      success: true,
+      message: "Resort амжилттай шинэчлэгдлээ",
+      resort,
+      files,
+    });
+
   } catch (err) {
     console.error("UPDATE RESORT ERROR ❌", err);
-    res.status(500).json({ success: false, message: err.message });
+    return res.status(500).json({ success: false, message: err.message });
   }
 };
 
