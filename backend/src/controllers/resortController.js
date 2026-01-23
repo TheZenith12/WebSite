@@ -4,9 +4,7 @@ import Resort from "../models/resortModel.js";
 import multer from "multer";
 
 const upload = multer({ storage: multer.memoryStorage() });
-// --------------------------------------------------
-// ✅ GET ALL Resortsfqdx
-// --------------------------------------------------
+
 export const getResorts = async (req, res) => {
   try {
     const resorts = await Resort.aggregate([
@@ -35,9 +33,7 @@ export const getResorts = async (req, res) => {
   }
 };
 
-// --------------------------------------------------
-// ✅ GET Resort by ID
-// --------------------------------------------------
+
 export const getResortById = async (req, res) => {
   try {
     const resort = await Resort.findById(req.params.id);
@@ -165,8 +161,18 @@ export const updateResort = async (req, res) => {
 
     const resort = await Resort.findByIdAndUpdate(id, updateData, { new: true });
     if (!resort) {
-      return res.status(404).json({ success: false, message: "Resort олдсонгүй" });
-    }
+  return res.status(404).json({ message: "Resort not found" });
+}
+
+if (images && images.length > 0) {
+  resort.images = [...resort.images, ...images];
+}
+
+if (videos && videos.length > 0) {
+  resort.videos = [...resort.videos, ...videos];
+}
+
+await resort.save();
 
     let files = await File.findOne({ resortsId: id });
     if (!files) files = new File({ resortsId: id, images: [], videos: [] });
