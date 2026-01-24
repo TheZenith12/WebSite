@@ -80,32 +80,27 @@ export default function Details() {
 
         setResort(data.resort || data);
 
-        // IMAGES
-        let imgs = normalizeImagesField(
-          data.images ||
-            data.gallery ||
-            data.image ||
-            data.photos ||
-            (data.files?.[0]?.images ?? [])
-        );
+        // IMAGES (NEW – CORRECT)
+const imgs = data.files?.images || [];
 
-        const fullImgs = imgs.map((src) =>
-          /^https?:\/\//i.test(src)
-            ? src
-            : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
-        );
+const fullImgs = imgs.map((src) =>
+  /^https?:\/\//i.test(src)
+    ? src
+    : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
+);
 
-        setImages(fullImgs);
-        setCurrentImg(fullImgs[0] || "");
+setImages(fullImgs);
+setCurrentImg(fullImgs[0] || "");
 
-        // VIDEOS
-        const vids = normalizeImagesField(data.files?.[0]?.videos || []);
-        const fullVids = vids.map((src) =>
-          /^https?:\/\//i.test(src)
-            ? src
-            : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
-        );
-        setVideos(fullVids);
+        const vids = data.files?.videos || [];
+
+const fullVids = vids.map((src) =>
+  /^https?:\/\//i.test(src)
+    ? src
+    : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
+);
+
+setVideos(fullVids);
 
         fetchReviews();
       } catch (err) {
