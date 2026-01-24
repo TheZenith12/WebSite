@@ -188,7 +188,6 @@ function Resorts() {
                     />
                   </button>
 
-                  {/* Үнэлгээ */}
                   <div className="absolute bottom-4 left-4 flex items-center gap-1 bg-white/95 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
                     <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     <span className="font-semibold text-sm">{resort.rating}</span>
