@@ -12,7 +12,7 @@ export const getResorts = async (req, res) => {
         $lookup: {
           from: "files",
           localField: "_id",
-          foreignField: "resortsId",
+          foreignField: "resortId",
           as: "files",
         },
       },
@@ -37,14 +37,23 @@ export const getResorts = async (req, res) => {
 export const getResortById = async (req, res) => {
   try {
     const resort = await Resort.findById(req.params.id);
-    if (!resort) return res.status(404).json({ message: "Not found" });
+    if (!resort) {
+      return res.status(404).json({ success: false, message: "Resort not found" });
+    }
 
-    const files = await File.find({ resortsId: resort._id });
-    res.json({ resort, files });
+    const files = await File.findOne({ resortId: resort._id });
+
+    res.json({
+      success: true,
+      resort,
+      files: files || { images: [], videos: [] },
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("GET RESORT ERROR:", err);
+    res.status(500).json({ success: false, message: err.message });
   }
 };
+
 
 
 export const createResort = async (req, res) => {
@@ -233,9 +242,9 @@ export const deleteResort = async (req, res) => {
     const resort = await Resort.findById(id);
     if (!resort) return res.status(404).json({ message: "Not found" });
 
-    const files = await File.find({ resortsId: id });
+    const files = await File.find({ resortId: id });
 
-    await File.deleteMany({ resortsId: id });
+    await File.deleteMany({ resortId: id });
     await Resort.findByIdAndDelete(id);
 
     res.json({ success: true, message: "Resort deleted" });
