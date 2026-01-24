@@ -41,19 +41,20 @@ function EditResort() {
         const res = await axios.get(`${API_BASE}/api/admin/resorts/${id}`);
 
         const resort = res.data.resort;
-        const files = res.data.files || [];
+const files = res.data.files; // ❗ array биш object
 
-        setForm({
-          name: resort.name,
-          description: resort.description,
-          price: resort.price,
-          location: resort.location,
-          lat: resort.lat,
-          lng: resort.lng,
-        });
+setForm({
+  name: resort.name || "",
+  description: resort.description || "",
+  price: resort.price || "",
+  location: resort.location || "",
+  lat: resort.lat || "",
+  lng: resort.lng || "",
+});
 
-        setExistingImages(files.flatMap((f) => f.images || []));
-        setExistingVideos(files.flatMap((f) => f.videos || []));
+setExistingImages(files?.images || []);
+setExistingVideos(files?.videos || []);
+
       } catch (err) {
         setError("Амралтын газар ачаалахад алдаа гарлаа");
       } finally {
