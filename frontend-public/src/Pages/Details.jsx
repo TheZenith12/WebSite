@@ -116,41 +116,69 @@ setVideos(fullVids);
   // ------------------------
   // Load Google Maps
   // ------------------------
-  useEffect(() => {
-    if (!resort?.lat || !resort?.lng) return;
+useEffect(() => {
+  if (!resort?.lat || !resort?.lng) return;
 
-    const scriptId = "google-maps-script";
+  const scriptId = "google-maps-script";
 
-    const initMap = () => {
-      const pos = {
-        lat: Number(resort.lat),
-        lng: Number(resort.lng),
-      };
-
-      googleMapRef.current = new window.google.maps.Map(mapRef.current, {
-        zoom: 12,
-        center: pos,
-      });
-
-      new window.google.maps.Marker({
-        position: pos,
-        map: googleMapRef.current,
-        title: resort.name,
-      });
+  const initMap = () => {
+    const pos = {
+      lat: Number(resort.lat),
+      lng: Number(resort.lng),
     };
 
-    if (!document.getElementById(scriptId)) {
-      const script = document.createElement("script");
-      script.id = scriptId;
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${MAP_KEY}`;
-      script.async = true;
-      script.defer = true;
-      script.onload = initMap;
-      document.body.appendChild(script);
-    } else {
-      initMap();
-    }
-  }, [resort]);
+    const map = new window.google.maps.Map(mapRef.current, {
+      center: pos,
+      zoom: 13,
+      disableDefaultUI: true, // цэвэр харагдуулна
+      zoomControl: true,
+      fullscreenControl: true,
+      styles: [
+        { elementType: "geometry", stylers: [{ color: "#1d1d1d" }] },
+        { elementType: "labels.text.fill", stylers: [{ color: "#8ec3b9" }] },
+        { elementType: "labels.text.stroke", stylers: [{ color: "#1a3646" }] },
+        {
+          featureType: "road",
+          elementType: "geometry",
+          stylers: [{ color: "#38414e" }],
+        },
+        {
+          featureType: "water",
+          elementType: "geometry",
+          stylers: [{ color: "#0e1626" }],
+        },
+        {
+          featureType: "poi",
+          elementType: "labels",
+          stylers: [{ visibility: "off" }],
+        },
+      ],
+    });
+
+    // 🏨 Custom marker
+    new window.google.maps.Marker({
+      position: pos,
+      map,
+      title: resort.name,
+      icon: {
+        url: "/resort-marker.png", // public folder дотор байлга
+        scaledSize: new window.google.maps.Size(42, 42),
+      },
+    });
+  };
+
+  if (!document.getElementById(scriptId)) {
+    const script = document.createElement("script");
+    script.id = scriptId;
+    script.src = `https://maps.googleapis.com/maps/api/js?key=${MAP_KEY}`;
+    script.async = true;
+    script.defer = true;
+    script.onload = initMap;
+    document.body.appendChild(script);
+  } else {
+    initMap();
+  }
+}, [resort]);
 
   // ------------------------
   // Fetch Reviews
