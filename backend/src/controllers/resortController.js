@@ -130,15 +130,7 @@ if (typeof videos === "string") {
 export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
-    alert("0");
-    
-const notifier = require("node-notifier");
-
-notifier.notify({
-  title: "Server Alert",
-  message: "Шинэ request орж ирлээ",
-});
-
+    console.log("1");
 
     let {
       name,
