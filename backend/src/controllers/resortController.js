@@ -202,25 +202,38 @@ export const updateResort = async (req, res) => {
 
     // Remove images
     for (const url of removedImages) {
-      alert("1");
-      const publicId = extractPublicId(url);
-      alert("2");
-      if (publicId) await cloudinary.uploader.destroy(publicId);
-      alert("3");
-    }
-    files.images = files.images.filter(img => !removedImages.includes(img));
-    alert("4");
+  const publicId = extractPublicId(url);
+  if (!publicId) continue;
+
+  try {
+    await cloudinary.uploader.destroy(publicId);
+  } catch (err) {
+    console.error("Cloudinary image delete error:", err);
+  }
+}
+
+files.images = files.images.filter(
+  (img) => !removedImages.includes(img)
+);
 
 
     // Remove videos
     for (const url of removedVideos) {
-      const publicId = extractPublicId(url);
-      if (publicId) {
-        await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
-      }
-    }
-    files.videos = files.videos.filter(v => !removedVideos.includes(v));
+  const publicId = extractPublicId(url);
+  if (!publicId) continue;
 
+  try {
+    await cloudinary.uploader.destroy(publicId, {
+      resource_type: "video",
+    });
+  } catch (err) {
+    console.error("Cloudinary video delete error:", err);
+  }
+}
+
+files.videos = files.videos.filter(
+  (v) => !removedVideos.includes(v)
+);
     // Add new files
     if (newImages.length) files.images.push(...newImages);
     if (newVideos.length) files.videos.push(...newVideos);
