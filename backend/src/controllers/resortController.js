@@ -130,6 +130,7 @@ if (typeof videos === "string") {
 export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
+    alert("0");
 
     let {
       name,
