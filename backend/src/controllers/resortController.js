@@ -131,7 +131,6 @@ export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
     alert("0");
-    const [show, setShow] = useState(false);
 
 {show && (
   <div className="alert">
