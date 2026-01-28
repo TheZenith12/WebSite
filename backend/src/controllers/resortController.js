@@ -201,10 +201,15 @@ export const updateResort = async (req, res) => {
 
     // Remove images
     for (const url of removedImages) {
+      alert("1");
       const publicId = extractPublicId(url);
+      alert("2");
       if (publicId) await cloudinary.uploader.destroy(publicId);
+      alert("3");
     }
     files.images = files.images.filter(img => !removedImages.includes(img));
+    alert("4");
+
 
     // Remove videos
     for (const url of removedVideos) {
