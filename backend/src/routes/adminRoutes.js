@@ -7,12 +7,14 @@ import {
   updateResort,
   deleteResort
 } from "../controllers/resortController.js";
+import { loginAdmin } from "../controllers/adminController.js";
 
 const router = express.Router();
 
 // 🔐 ЗӨВХӨН ЭНД
 router.use(protect);
 
+router.post("/login", loginAdmin);
 router.get("/resorts", getResorts);
 router.post("/resorts", createResort);
 router.put("/resorts/:id", updateResort);
