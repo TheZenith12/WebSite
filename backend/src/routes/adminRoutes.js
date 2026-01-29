@@ -1,3 +1,4 @@
+// routes/adminRoutes.js
 import express from "express";
 import { protect } from "../middleware/auth.js";
 import {
@@ -9,7 +10,7 @@ import {
 
 const router = express.Router();
 
-// 🔐 БҮГД хамгаалагдана
+// 🔐 ЗӨВХӨН ЭНД
 router.use(protect);
 
 router.get("/resorts", getResorts);

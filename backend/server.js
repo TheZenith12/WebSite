@@ -5,9 +5,9 @@ import cors from 'cors';
 
 // Routes
 import connectDB from './src/config/db.js';
-import authRoutes from './src/routes/auth.js';
-import resortRoutes from "./src/routes/resorts.js";
+import authRoutes from './src/routes/authRoutes.js';
 import fileRoutes from './src/routes/fileRoutes.js';
+import adminRoutes from './src/routes/adminRoutes.js';
 
 dotenv.config();
 
@@ -45,9 +45,10 @@ app.use((req, res, next) => {
 connectDB();
 
 // API Routes
-app.use('/api/admin/resorts', resortRoutes);
+app.use("/api/auth", authRoutes); 
+app.use('/api/admin/resorts', adminRoutes);
 app.use("/api/admin/files", fileRoutes);
-app.use("/api/admin", authRoutes);
+
 
 // Error handler
 app.use((err, req, res, next) => {
