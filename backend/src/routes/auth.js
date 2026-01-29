@@ -1,8 +1,8 @@
 import express from "express";
-import { protect } from "../controllers/authController.js";
+import { protect } from "../middlewares/auth.js";
 import {
   getResorts,
-  addResort,
+  createResort,
   updateResort,
   deleteResort
 } from "../controllers/resortController.js";
@@ -13,7 +13,7 @@ const router = express.Router();
 router.use(protect);
 
 router.get("/resorts", getResorts);
-router.post("/resorts", addResort);
+router.post("/resorts", createResort);
 router.put("/resorts/:id", updateResort);
 router.delete("/resorts/:id", deleteResort);
 
