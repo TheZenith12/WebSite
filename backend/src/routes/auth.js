@@ -1,15 +1,9 @@
-import express from "express";
-import authMiddleware from "../middlewares/auth.js";
-import {
-  addResort,
-  updateResort,
-  getResorts,
-} from "../controllers/resortController.js";
+import express from 'express';
+import { login, register } from '../controllers/authController.js';
 
 const router = express.Router();
 
-router.get("/resorts", authMiddleware, getResorts);
-router.post("/resorts/add", authMiddleware, addResort);
-router.put("/resorts/edit/:id", authMiddleware, updateResort);
+router.post('/login', login);
+router.post('/register', register);
 
 export default router;
