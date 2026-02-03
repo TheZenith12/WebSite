@@ -36,7 +36,7 @@ app.use(
 connectDB();
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/admin", authRoutes);
 app.use("/api/admin/resorts", adminRoutes);
 app.use("/api/admin/files", fileRoutes);
 
