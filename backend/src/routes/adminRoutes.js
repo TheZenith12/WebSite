@@ -13,7 +13,7 @@ const router = express.Router();
 // 🔐 ЗӨВХӨН ЭНД
 router.use(protect);
 
-router.get("/", getResorts);
+router.get("/resorts", getResorts);
 router.post("/resorts", createResort);
 router.put("/resorts/:id", updateResort);
 router.delete("/resorts/:id", deleteResort);
