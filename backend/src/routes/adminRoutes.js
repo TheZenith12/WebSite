@@ -7,7 +7,7 @@ import {
   updateResort,
   deleteResort
 } from "../controllers/resortController.js";
-import { loginAdmin } from "../controllers/adminController.js";
+import { loginAdmin } from "../controllers/authController.js";
 
 const router = express.Router();
 
