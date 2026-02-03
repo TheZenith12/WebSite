@@ -9,20 +9,28 @@ function Resorts() {
   const [error, setError] = useState(null);
 
   // 🔹 Resort жагсаалт авах
-  async function fetchResorts() {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/resorts`);
-      if (!res.ok) throw new Error("Failed to fetch resorts");
-      const data = await res.json();
-      console.log("data:", data);
-      setList(data.resorts || data); // хэрэв backend data.resorts буцаадаг бол
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+ async function fetchResorts() {
+  setLoading(true);
+  try {
+    const token = localStorage.getItem("token");
+
+    const res = await fetch(`${API_BASE}/api/admin/resorts`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) throw new Error("Failed to fetch resorts");
+
+    const data = await res.json();
+    setList(data.resorts || []);
+  } catch (err) {
+    setError(err.message);
+  } finally {
+    setLoading(false);
   }
+}
+
 
   useEffect(() => {
     fetchResorts();
@@ -30,18 +38,26 @@ function Resorts() {
 
   // 🔹 Resort устгах
   async function removeResort(id) {
-    console.log("Deleting ID:", id);
-    if (!confirm("Та энэ амралтын газрыг устгахдаа итгэлтэй байна уу?")) return;
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/resorts/${id}`, {
-        method: "DELETE",
-      });
-      if (!res.ok) throw new Error("Failed to delete resort");
-      setList(list.filter((r) => r._id !== id));
-    } catch (err) {
-      alert(err.message);
-    }
+  if (!confirm("Та устгахдаа итгэлтэй байна уу?")) return;
+
+  const token = localStorage.getItem("token");
+
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/resorts/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) throw new Error("Failed to delete resort");
+
+    setList(list.filter((r) => r._id !== id));
+  } catch (err) {
+    alert(err.message);
   }
+}
+
 
   return (
     <div>
