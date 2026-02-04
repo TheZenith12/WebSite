@@ -16,7 +16,7 @@ function Resorts() {
 
     const res = await fetch(`${API_BASE}/api/admin/resorts`, {
  headers: {
-    Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+    Authorization: `Bearer ${localStorage.getItem("Token")}`,
   },
 });
 
