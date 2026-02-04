@@ -3,8 +3,6 @@ import File from "../models/fileModel.js";
 import Resort from "../models/resortModel.js";
 import multer from "multer";
 
-const upload = multer({ storage: multer.memoryStorage() });
-
 export const getResorts = async (req, res) => {
   try {
     const resorts = await Resort.aggregate([
@@ -17,8 +15,11 @@ export const getResorts = async (req, res) => {
         },
       },
       {
-        $addFields: { image: { $arrayElemAt: ["$files.images", 0] } },
-      },
+  $addFields: {
+    images: { $arrayElemAt: ["$files.images", 0] },
+    videos: { $arrayElemAt: ["$files.videos", 0] }
+  }
+},
       { $project: { files: 0, __v: 0 } },
       { $sort: { createdAt: -1 } },
     ]);
@@ -130,7 +131,6 @@ if (typeof videos === "string") {
 export const updateResort = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("1");
 
     let {
       name,
@@ -263,7 +263,17 @@ export const deleteResort = async (req, res) => {
 
     const files = await File.find({ resortId: id });
 
-    await File.deleteMany({ resortId: id });
+    for (const img of files.images) {
+  await cloudinary.uploader.destroy(extractPublicId(img));
+}
+
+for (const vid of files.videos) {
+  await cloudinary.uploader.destroy(
+    extractPublicId(vid),
+    { resource_type: "video" }
+  );
+}
+
     await Resort.findByIdAndDelete(id);
 
     res.json({ success: true, message: "Resort deleted" });

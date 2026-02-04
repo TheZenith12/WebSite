@@ -1,5 +1,5 @@
 import express from "express";
-import { protect } from "../middleware/auth.js";
+import { protect, verifyAdmin } from "../middleware/auth.js";
 import {
   getResorts,
   createResort,
@@ -10,7 +10,7 @@ import {
 const router = express.Router();
 
 // 🔐 admin token байхад л хангалттай
-router.use(protect);
+router.use(protect, verifyAdmin);
 
 router.get("/resorts", getResorts);
 router.post("/resorts", createResort);
