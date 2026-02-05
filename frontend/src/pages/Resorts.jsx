@@ -38,10 +38,6 @@ function Resorts() {
 useEffect(() => {
   const token = localStorage.getItem("token");
 
-  if (!token) {
-    navigate("/login"); // 👈 token байхгүй бол login руу
-    return;
-  }
 
   fetchResorts();
 }, []);
