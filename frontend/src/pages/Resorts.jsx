@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
 function Resorts() {
+  const navigate = useNavigate();
+
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -33,9 +35,17 @@ function Resorts() {
 }
 
 
-  useEffect(() => {
-    fetchResorts();
-  }, []);
+useEffect(() => {
+  const token = localStorage.getItem("token");
+
+  if (!token) {
+    navigate("/login"); // 👈 token байхгүй бол login руу
+    return;
+  }
+
+  fetchResorts();
+}, []);
+
 
   // 🔹 Resort устгах
   async function removeResort(id) {
