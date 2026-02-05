@@ -2,7 +2,6 @@ import express from "express";
 import { protect, verifyAdmin } from "../middleware/auth.js";
 import {
   getResorts,
-  getResortById,
   createResort,
   updateResort,
   deleteResort
@@ -10,15 +9,12 @@ import {
 
 const router = express.Router();
 
+// 🔐 admin token байхад л хангалттай
 router.use(protect, verifyAdmin);
 
-router.route("/resorts")
-  .get(getResorts)
-  .post(createResort);
-
-router.route("/resorts/:id")
-  .get(getResortById)
-  .put(updateResort)
-  .delete(deleteResort);
+router.get("/resorts", getResorts);
+router.post("/resorts", createResort);
+router.put("/resorts/:id", updateResort);
+router.delete("/resorts/:id", deleteResort);
 
 export default router;
