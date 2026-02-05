@@ -15,10 +15,11 @@ function Resorts() {
     const token = localStorage.getItem("token");
 
     const res = await fetch(`${API_BASE}/api/admin/resorts`, {
- headers: {
-    Authorization: `Bearer ${localStorage.getItem("Token")}`,
-  },
-});
+     headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
 
     if (!res.ok) throw new Error("Failed to fetch resorts");
 
