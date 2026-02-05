@@ -30,8 +30,8 @@ app.use(helmet({
 
 // CORS - зөвхөн allowed origins-ийг зөвшөөрөх
 const allowedOrigins = [
-  "https://amaraltws-admin.vercel.app/",
-  "https://amaraltws.vercel.app/",
+  "https://amaraltws-admin.vercel.app",
+  "https://amaraltws.vercel.app",
   process.env.FRONTEND_URL
 ].filter(Boolean);
 
