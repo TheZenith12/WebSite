@@ -67,8 +67,8 @@ function Resorts() {
             <div className="flex gap-4">
               <img
   src={
-    Array.isArray(r.image) && r.image.length > 0
-      ? `${API_BASE.replace(/\/$/, "")}${r.image[0]}`
+    Array.isArray( r.images ) && r.images.length > 0
+      ? `${API_BASE.replace(/\/$/, "")}${r.images[0]}`
       : "/no-image.png"
   }
   alt={r.name}
