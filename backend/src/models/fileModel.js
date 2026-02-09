@@ -5,34 +5,12 @@ const fileSchema = new mongoose.Schema(
     resortId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Resort",
-      required: [true, "Resort ID шаардлагатай"],
-      unique: true,
-      index: true
+      required: true,
     },
-    
-    images: {
-      type: [String],
-      default: [],
-      validate: {
-        validator: function(arr) {
-          return arr.every(url => /^https?:\/\/.+/.test(url));
-        },
-        message: "Зөв URL хэлбэртэй байх ёстой"
-      }
-    },
-    
-    videos: {
-      type: [String],
-      default: [],
-      validate: {
-        validator: function(arr) {
-          return arr.every(url => /^https?:\/\/.+/.test(url));
-        },
-        message: "Зөв URL хэлбэртэй байх ёстой"
-      }
-    }
+    images: [String],
+    videos: [String],
   },
   { timestamps: true }
 );
 
-export default mongoose.model("File", fileSchema);
+export default mongoose.model("Files", fileSchema);
