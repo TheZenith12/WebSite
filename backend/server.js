@@ -12,11 +12,6 @@ import authRoutes from "./src/routes/auth.js";
 import resortRoutes from "./src/routes/resorts.js";
 import fileRoutes from "./src/routes/fileRoutes.js";
 
-<<<<<<< HEAD
-const app = express();
-=======
-import { useEffect, useState } from "react";
-
 const [pageViews, setPageViews] = useState(0);
 
 useEffect(() => {
@@ -26,7 +21,6 @@ useEffect(() => {
 }, []);
 
 dotenv.config();
->>>>>>> 9310555b0ec6973cd29ec22de5359ab6afbc33a4
 
 // Middleware
 app.use(express.json());
