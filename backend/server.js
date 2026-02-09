@@ -5,7 +5,7 @@ import cors from 'cors';
 
 // Routes
 import connectDB from './src/config/db.js';
-import authRoutes from './src/routes/resorts.js';
+import authRoutes from './src/routes/auth.js';
 import resortRoutes from "./src/routes/resorts.js";
 import fileRoutes from './src/routes/fileRoutes.js';
 
