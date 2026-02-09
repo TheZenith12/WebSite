@@ -9,9 +9,28 @@ import authRoutes from './src/routes/auth.js';
 import resortRoutes from "./src/routes/resorts.js";
 import fileRoutes from './src/routes/fileRoutes.js';
 
-dotenv.config();
-
 const app = express();
+app.use(cors());
+app.use(express.json());
+
+app.post("/api/page-view", async (req, res) => {
+  await db.query(
+    "UPDATE stats SET page_views = page_views + 1 WHERE id = 1"
+  );
+  res.json({ success: true });
+});
+
+app.get("/api/stats", async (req, res) => {
+  const [rows] = await db.query(
+    "SELECT page_views FROM stats WHERE id = 1"
+  );
+  res.json({ pageViews: rows[0].page_views });
+});
+
+app.listen(3000);
+
+
+dotenv.config();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
