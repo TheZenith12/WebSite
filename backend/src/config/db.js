@@ -1,15 +1,14 @@
 import mongoose from 'mongoose';
 
-const mysql = require("mysql2/promise");
+const mongoose = require("mongoose");
 
-const db = mysql.createPool({
-  host: "localhost",
-  user: "root",
-  password: "password",
-  database: "amraltiin_db"
+mongoose.connect("mongodb://127.0.0.1:27017/amraltiin_db", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 });
 
-module.exports = db;
+module.exports = mongoose;
+
 
 
 const connectDB = async () => {
