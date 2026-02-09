@@ -66,11 +66,15 @@ function Resorts() {
           >
             <div className="flex gap-4">
               <img
-                
-                src={`${API_BASE.replace(/\/$/, "")}${r.image[0]}`}    
-                alt={r.name}
-                className="w-28 h-20 rounded object-cover"
-              />
+  src={
+    Array.isArray(r.image) && r.image.length > 0
+      ? `${API_BASE.replace(/\/$/, "")}${r.image[0]}`
+      : "/no-image.png"
+  }
+  alt={r.name}
+  className="w-28 h-20 rounded object-cover"
+/>
+
               <div>
                 <div className="font-semibold text-lg">{r.name}</div>
                 <div className="text-gray-600 text-sm mb-1">
