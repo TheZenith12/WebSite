@@ -65,7 +65,12 @@ function Resorts() {
             className="p-4 bg-white rounded-lg shadow flex justify-between items-start"
           >
             <div className="flex gap-4">
-             <img src={r.image} alt={r.name} className="w-28 h-20 rounded object-cover" />
+            <img
+  src={r.image || "/placeholder.jpg"}
+  onError={(e) => {
+    e.target.src = "/placeholder.jpg";
+  }}
+/>
 
               <div>
                 <div className="font-semibold text-lg">{r.name}</div>
