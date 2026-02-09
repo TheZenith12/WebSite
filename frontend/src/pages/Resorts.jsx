@@ -65,15 +65,7 @@ function Resorts() {
             className="p-4 bg-white rounded-lg shadow flex justify-between items-start"
           >
             <div className="flex gap-4">
-              <img
-  src={
-    Array.isArray( r.images ) && r.images.length > 0
-      ? `${API_BASE.replace(/\/$/, "")}${r.images[0]}`
-      : "/no-image.png"
-  }
-  alt={r.name}
-  className="w-28 h-20 rounded object-cover"
-/>
+             <img src={r.image} alt={r.name} className="w-28 h-20 rounded object-cover" />
 
               <div>
                 <div className="font-semibold text-lg">{r.name}</div>
