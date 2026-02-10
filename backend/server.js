@@ -1,5 +1,5 @@
 import dotenv from "dotenv";
-dotenv.config(); // 🔴 ЗААВАЛ ЭХЭНД
+dotenv.config();
 
 import express from "express";
 import cors from "cors";
@@ -12,15 +12,7 @@ import authRoutes from "./src/routes/auth.js";
 import resortRoutes from "./src/routes/resorts.js";
 import fileRoutes from "./src/routes/fileRoutes.js";
 
-const [pageViews, setPageViews] = useState(0);
-
-useEffect(() => {
-  fetch("http://localhost:3000/api/stats")
-    .then(res => res.json())
-    .then(data => setPageViews(data.pageViews));
-}, []);
-
-dotenv.config();
+const app = express();
 
 // Middleware
 app.use(express.json());
@@ -41,8 +33,16 @@ app.use(
 
 app.options("*", cors());
 
-// DB connect
+// DB
 connectDB();
+
+// ===== PAGE VIEWS =====
+let pageViews = 0;
+
+app.get("/api/stats", (req, res) => {
+  pageViews++;
+  res.json({ pageViews });
+});
 
 // Routes
 app.use("/api/admin", authRoutes);
@@ -60,5 +60,4 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message });
 });
 
-// ❗ Vercel дээр LISTEN ХИЙХГҮЙ
 export default app;

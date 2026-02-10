@@ -7,6 +7,7 @@ function Resorts() {
   const [list, setList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [pageViews, setPageViews] = useState(0);
 
   // 🔹 Resort жагсаалт авах
   async function fetchResorts() {
@@ -24,9 +25,20 @@ function Resorts() {
     }
   }
 
-  useEffect(() => {
-    fetchResorts();
-  }, []);
+  async function fetchPageViews() {
+  try {
+    const res = await fetch(`${API_BASE}/api/stats`);
+    const data = await res.json();
+    setPageViews(data.pageViews);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+useEffect(() => {
+  fetchResorts();
+  fetchPageViews();
+}, []);
 
   // 🔹 Resort устгах
   async function removeResort(id) {
