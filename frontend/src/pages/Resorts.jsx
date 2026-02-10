@@ -78,11 +78,18 @@ useEffect(() => {
           >
             <div className="flex gap-4">
             <img
-  src={r.image || "/placeholder.jpg"}
+  src={
+    r.image
+      ? `${API_BASE}${r.image}`
+      : "/placeholder.jpg"
+  }
   onError={(e) => {
+    e.target.onerror = null;
     e.target.src = "/placeholder.jpg";
   }}
+  className="w-24 h-24 object-cover rounded"
 />
+
 
               <div>
                 <div className="font-semibold text-lg">{r.name}</div>
