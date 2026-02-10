@@ -236,17 +236,6 @@ export default function Details() {
                 {resort.description || "Тайлбар байхгүй байна."}
               </p>
             </div>
-            
-            {/* Price Card */}
-            <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl">
-              <div className="text-sm opacity-90 mb-2">Хоногийн үнэ</div>
-              <div className="text-5xl font-bold mb-6">
-                {resort.price ? `${parseInt(resort.price).toLocaleString()}₮` : "—"}
-              </div>
-              <button className="w-full py-4 bg-white text-teal-600 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-lg">
-                Захиалах
-              </button>
-            </div>
           </div>
 
           {/* Image Gallery */}
