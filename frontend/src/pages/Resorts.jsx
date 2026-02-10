@@ -80,8 +80,8 @@ useEffect(() => {
             <img
   src={
     r.image
-      ? `${API_BASE}${r.image}`
-      : "/placeholder.jpg"
+      ? `${API_BASE}`
+      : "/"
   }
   onError={(e) => {
     e.target.onerror = null;
