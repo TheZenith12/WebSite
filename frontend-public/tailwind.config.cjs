@@ -3,15 +3,15 @@ module.exports = {
   content: ['./index.html', './src/**/*.{js,jsx,ts,tsx}'],
   theme: {
     extend: {
-      keyframes: {
-        'slide-left': {
-          '0%': { transform: 'translateX(100px)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
-        },
-      },
       animation: {
-        'slide-left': 'slide-left 0.3s ease-out',
+        'float': 'float 6s ease-in-out infinite',
       },
+      keyframes: {
+        float: {
+          '0%, 100%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-20px)' },
+        }
+      }
     },
   },
   plugins: [],

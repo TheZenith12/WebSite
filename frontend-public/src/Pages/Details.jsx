@@ -1,57 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
+import { Star, MapPin, Eye, Heart, ArrowLeft, Send } from "lucide-react";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 const MAP_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
-
-// ------------------------
-// Image normalize function
-// ------------------------
-function normalizeImagesField(field) {
-  if (!field) return [];
-
-  if (Array.isArray(field)) {
-    return field
-      .map((item) => {
-        if (!item) return null;
-        if (typeof item === "string") return item;
-        if (typeof item === "object") {
-          return (
-            item.url ||
-            item.path ||
-            item.filename ||
-            item.src ||
-            item.image ||
-            null
-          );
-        }
-        return null;
-      })
-      .filter(Boolean);
-  }
-
-  if (typeof field === "string") {
-    try {
-      const parsed = JSON.parse(field);
-      return normalizeImagesField(parsed);
-    } catch {
-      if (field.includes(",")) {
-        return field
-          .split(",")
-          .map((s) => s.trim())
-          .filter(Boolean);
-      }
-      return [field];
-    }
-  }
-
-  if (typeof field === "object") {
-    return Object.values(field).filter(Boolean);
-  }
-
-  return [];
-}
 
 export default function Details() {
   const { id } = useParams();
@@ -65,13 +18,11 @@ export default function Details() {
   const [userName, setUserName] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
+  const [isLiked, setIsLiked] = useState(false);
 
   const mapRef = useRef(null);
-  const googleMapRef = useRef(null);
 
-  // ------------------------
-  // Fetch Resort + Reviews
-  // ------------------------
+  // Fetch Resort Data
   useEffect(() => {
     async function fetchData() {
       try {
@@ -80,27 +31,22 @@ export default function Details() {
 
         setResort(data.resort || data);
 
-        // IMAGES (NEW – CORRECT)
-const imgs = data.files?.images || [];
-
-const fullImgs = imgs.map((src) =>
-  /^https?:\/\//i.test(src)
-    ? src
-    : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
-);
-
-setImages(fullImgs);
-setCurrentImg(fullImgs[0] || "");
+        const imgs = data.files?.images || [];
+        const fullImgs = imgs.map((src) =>
+          /^https?:\/\//i.test(src)
+            ? src
+            : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
+        );
+        setImages(fullImgs);
+        setCurrentImg(fullImgs[0] || "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80");
 
         const vids = data.files?.videos || [];
-
-const fullVids = vids.map((src) =>
-  /^https?:\/\//i.test(src)
-    ? src
-    : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
-);
-
-setVideos(fullVids);
+        const fullVids = vids.map((src) =>
+          /^https?:\/\//i.test(src)
+            ? src
+            : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
+        );
+        setVideos(fullVids);
 
         fetchReviews();
       } catch (err) {
@@ -113,76 +59,62 @@ setVideos(fullVids);
     fetchData();
   }, [id]);
 
-  // ------------------------
-  // Load Google Maps
-  // ------------------------
-useEffect(() => {
-  if (!resort?.lat || !resort?.lng) return;
+  // Google Maps
+  useEffect(() => {
+    if (!resort?.lat || !resort?.lng) return;
 
-  const scriptId = "google-maps-script";
+    const scriptId = "google-maps-script";
 
-  const initMap = () => {
-    const pos = {
-      lat: Number(resort.lat),
-      lng: Number(resort.lng),
+    const initMap = () => {
+      const pos = {
+        lat: Number(resort.lat),
+        lng: Number(resort.lng),
+      };
+
+      const map = new window.google.maps.Map(mapRef.current, {
+        center: pos,
+        zoom: 13,
+        disableDefaultUI: false,
+        zoomControl: true,
+        fullscreenControl: true,
+        styles: [
+          { elementType: "geometry", stylers: [{ color: "#f5f5f5" }] },
+          { elementType: "labels.text.fill", stylers: [{ color: "#616161" }] },
+          { elementType: "labels.text.stroke", stylers: [{ color: "#f5f5f5" }] },
+          {
+            featureType: "road",
+            elementType: "geometry",
+            stylers: [{ color: "#ffffff" }],
+          },
+          {
+            featureType: "water",
+            elementType: "geometry",
+            stylers: [{ color: "#c9e9f6" }],
+          },
+        ],
+      });
+
+      new window.google.maps.Marker({
+        position: pos,
+        map,
+        title: resort.name,
+      });
     };
 
-    const map = new window.google.maps.Map(mapRef.current, {
-      center: pos,
-      zoom: 13,
-      disableDefaultUI: true, // цэвэр харагдуулна
-      zoomControl: true,
-      fullscreenControl: true,
-      styles: [
-        { elementType: "geometry", stylers: [{ color: "#1d1d1d" }] },
-        { elementType: "labels.text.fill", stylers: [{ color: "#8ec3b9" }] },
-        { elementType: "labels.text.stroke", stylers: [{ color: "#1a3646" }] },
-        {
-          featureType: "road",
-          elementType: "geometry",
-          stylers: [{ color: "#38414e" }],
-        },
-        {
-          featureType: "water",
-          elementType: "geometry",
-          stylers: [{ color: "#0e1626" }],
-        },
-        {
-          featureType: "poi",
-          elementType: "labels",
-          stylers: [{ visibility: "off" }],
-        },
-      ],
-    });
+    if (!document.getElementById(scriptId)) {
+      const script = document.createElement("script");
+      script.id = scriptId;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${MAP_KEY}`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initMap;
+      document.body.appendChild(script);
+    } else if (window.google) {
+      initMap();
+    }
+  }, [resort]);
 
-    // 🏨 Custom marker
-    new window.google.maps.Marker({
-      position: pos,
-      map,
-      title: resort.name,
-      icon: {
-        url: "/resort-marker.png", // public folder дотор байлга
-        scaledSize: new window.google.maps.Size(42, 42),
-      },
-    });
-  };
-
-  if (!document.getElementById(scriptId)) {
-    const script = document.createElement("script");
-    script.id = scriptId;
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${MAP_KEY}`;
-    script.async = true;
-    script.defer = true;
-    script.onload = initMap;
-    document.body.appendChild(script);
-  } else {
-    initMap();
-  }
-}, [resort]);
-
-  // ------------------------
   // Fetch Reviews
-  // ------------------------
   const fetchReviews = async () => {
     try {
       const res = await axios.get(`${API_BASE}/api/reviews/${id}`);
@@ -192,9 +124,7 @@ useEffect(() => {
     }
   };
 
-  // ------------------------
   // Submit Review
-  // ------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
@@ -212,157 +142,258 @@ useEffect(() => {
     }
   };
 
-  // ------------------------
-  // LOADING HANDLING
-  // ------------------------
-  if (loading)
+  // Loading
+  if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-600">
-        ⏳ Уншиж байна...
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
+        <div className="text-center">
+          <div className="text-7xl mb-6 animate-bounce">⏳</div>
+          <div className="text-2xl text-gray-700 font-semibold">Уншиж байна...</div>
+        </div>
       </div>
     );
+  }
 
-  if (!resort)
+  if (!resort) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">
-            Амралтын газрын мэдээлэл олдсонгүй
-          </h2>
-          <Link to="/" className="text-blue-600 underline">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
+        <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
+          <div className="text-6xl mb-4">😕</div>
+          <h2 className="text-2xl font-bold mb-4">Амралтын газар олдсонгүй</h2>
+          <Link 
+            to="/" 
+            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+          >
+            <ArrowLeft className="w-5 h-5" />
             Буцах
           </Link>
         </div>
       </div>
     );
+  }
 
-  // ------------------------
-  // RENDER
-  // ------------------------
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* HERO */}
-      <div className="relative h-[420px] w-full">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
+      {/* Hero Image */}
+      <div className="relative h-[500px] w-full">
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent z-10" />
         <img
           src={currentImg}
           alt={resort.name}
           className="w-full h-full object-cover"
         />
-        <div className="absolute bottom-6 left-6 text-white">
-          <h1 className="text-3xl font-bold drop-shadow">{resort.name}</h1>
-        </div>
+        
+        {/* Back Button */}
         <Link
           to="/"
-          className="absolute top-6 left-6 bg-white px-4 py-2 rounded shadow"
+          className="absolute top-6 left-6 z-20 flex items-center gap-2 px-5 py-3 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:bg-white transition-all"
         >
-          ← Буцах
+          <ArrowLeft className="w-5 h-5" />
+          <span className="font-semibold">Буцах</span>
         </Link>
+
+        {/* Like Button */}
+        <button
+          onClick={() => setIsLiked(!isLiked)}
+          className="absolute top-6 right-6 z-20 w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
+        >
+          <Heart
+            className={`w-7 h-7 transition-colors ${
+              isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'
+            }`}
+          />
+        </button>
+
+        {/* Title Overlay */}
+        <div className="absolute bottom-8 left-8 z-20 text-white max-w-2xl">
+          <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">{resort.name}</h1>
+          <div className="flex items-center gap-6 text-lg">
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+              <MapPin className="w-5 h-5" />
+              <span>{resort.location || "Монгол"}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+              <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
+              <span>{resort.rating || "4.8"}</span>
+            </div>
+            <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+              <Eye className="w-5 h-5" />
+              <span>2.5k үзсэн</span>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div className="container mx-auto px-6 -mt-16 relative">
-        <div className="bg-white p-6 rounded-2xl shadow-xl space-y-8">
-          {/* INFO */}
-          <h2 className="text-2xl font-bold">{resort.name}</h2>
-          <p className="text-gray-700">{resort.description}</p>
-
-          <div className="text-lg font-semibold text-teal-600">
-            💸 Үнэ: {resort.price}₮
-          </div>
-
-          {/* GALLERY */}
-          <div>
-            <h3 className="font-semibold mb-3">Зургийн галерей</h3>
-            <div className="flex space-x-3 overflow-x-auto pb-2">
-              {images.map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  className={`w-40 h-28 rounded-lg shadow cursor-pointer ${
-                    currentImg === src ? "ring-4 ring-teal-500" : ""
-                  }`}
-                  onClick={() => setCurrentImg(src)}
-                />
-              ))}
+      {/* Main Content */}
+      <div className="container mx-auto px-6 -mt-20 relative z-30">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-12">
+          
+          {/* Info Section */}
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-2">
+              <h2 className="text-3xl font-bold mb-4 text-gray-900">Тайлбар</h2>
+              <p className="text-gray-700 text-lg leading-relaxed">
+                {resort.description || "Тайлбар байхгүй байна."}
+              </p>
+            </div>
+            
+            {/* Price Card */}
+            <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl">
+              <div className="text-sm opacity-90 mb-2">Хоногийн үнэ</div>
+              <div className="text-5xl font-bold mb-6">
+                {resort.price ? `${parseInt(resort.price).toLocaleString()}₮` : "—"}
+              </div>
+              <button className="w-full py-4 bg-white text-teal-600 rounded-xl font-bold hover:bg-gray-50 transition-all shadow-lg">
+                Захиалах
+              </button>
             </div>
           </div>
 
-          {/* VIDEO + MAP */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* VIDEO */}
+          {/* Image Gallery */}
+          {images.length > 0 && (
             <div>
-              <h3 className="font-semibold mb-3">🎬 Видео</h3>
+              <h3 className="text-2xl font-bold mb-6 text-gray-900">Зургийн галерей</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {images.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`${resort.name} ${i + 1}`}
+                    className={`w-full h-48 object-cover rounded-xl shadow cursor-pointer transition-all duration-300 ${
+                      currentImg === src 
+                        ? 'ring-4 ring-teal-500 scale-105' 
+                        : 'hover:scale-105 hover:shadow-xl'
+                    }`}
+                    onClick={() => setCurrentImg(src)}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Video & Map */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Video */}
+            <div>
+              <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                🎬 Видео
+              </h3>
               {videos.length > 0 ? (
                 <video
                   src={videos[0]}
                   controls
-                  className="w-full h-64 rounded-xl"
+                  className="w-full h-80 rounded-2xl shadow-xl"
                 />
               ) : (
-                <div className="h-64 flex items-center justify-center text-gray-500">
-                  Видео байхгүй
+                <div className="h-80 flex items-center justify-center bg-gray-100 rounded-2xl text-gray-500">
+                  <div className="text-center">
+                    <div className="text-6xl mb-4">🎥</div>
+                    <p>Видео байхгүй</p>
+                  </div>
                 </div>
               )}
             </div>
 
-            {/* MAP */}
+            {/* Map */}
             <div>
-              <h3 className="font-semibold mb-3">🗺 Байршил</h3>
+              <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
+                🗺 Байршил
+              </h3>
               <div
                 ref={mapRef}
-                className="w-full h-64 rounded-xl border shadow"
-              ></div>
+                className="w-full h-80 rounded-2xl shadow-xl"
+              />
             </div>
           </div>
 
-          {/* REVIEWS */}
-          <div className="mt-10">
-            <h2 className="text-2xl font-bold mb-4">Сэтгэгдлүүд</h2>
+          {/* Reviews Section */}
+          <div className="pt-8 border-t border-gray-200">
+            <h2 className="text-3xl font-bold mb-8 text-gray-900">Сэтгэгдлүүд</h2>
 
-            {/* ADD REVIEW */}
-            <form onSubmit={handleSubmit} className="space-y-3 mb-6">
-              <input
-                className="p-2 border rounded w-full"
-                placeholder="Нэр"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                required
-              />
-              <textarea
-                className="p-2 border rounded w-full"
-                placeholder="Сэтгэгдэл"
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                required
-              />
-              <select
-                className="p-2 border rounded"
-                value={rating}
-                onChange={(e) => setRating(Number(e.target.value))}
-              >
-                {[1, 2, 3, 4, 5].map((n) => (
-                  <option key={n}>{n} од</option>
-                ))}
-              </select>
-              <button className="bg-teal-600 text-white px-4 py-2 rounded">
-                Илгээх
-              </button>
+            {/* Add Review Form */}
+            <form onSubmit={handleSubmit} className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-8 mb-8 shadow-lg">
+              <h3 className="text-xl font-bold mb-6 text-gray-900">Сэтгэгдэл үлдээх</h3>
+              <div className="space-y-4">
+                <input
+                  type="text"
+                  className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-200 outline-none transition-all"
+                  placeholder="Таны нэр"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
+                  required
+                />
+                <textarea
+                  className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-200 outline-none transition-all resize-none"
+                  placeholder="Таны сэтгэгдэл..."
+                  rows="4"
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  required
+                />
+                <div className="flex gap-4 items-center">
+                  <select
+                    className="px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-200 outline-none transition-all font-semibold"
+                    value={rating}
+                    onChange={(e) => setRating(Number(e.target.value))}
+                  >
+                    {[1, 2, 3, 4, 5].map((n) => (
+                      <option key={n} value={n}>{"⭐".repeat(n)} {n} од</option>
+                    ))}
+                  </select>
+                  <button 
+                    type="submit"
+                    className="flex-1 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl"
+                  >
+                    <Send className="w-5 h-5" />
+                    Илгээх
+                  </button>
+                </div>
+              </div>
             </form>
 
-            {/* LIST REVIEWS */}
-            {reviews.length === 0 ? (
-              <p className="text-gray-500 italic">Сэтгэгдэл байхгүй байна.</p>
-            ) : (
-              reviews.map((r) => (
-                <div key={r._id} className="border-b py-2">
-                  <strong>{r.userName}</strong> — {r.rating} од
-                  <p>{r.comment}</p>
+            {/* Reviews List */}
+            <div className="space-y-6">
+              {reviews.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 rounded-2xl">
+                  <div className="text-6xl mb-4">💬</div>
+                  <p className="text-gray-500 text-lg">Сэтгэгдэл байхгүй байна. Эхний сэтгэгдлээ үлдээгээрэй!</p>
                 </div>
-              ))
-            )}
+              ) : (
+                reviews.map((r) => (
+                  <div key={r._id} className="bg-gray-50 rounded-2xl p-6 hover:shadow-lg transition-shadow">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="font-bold text-lg text-gray-900">{r.userName}</h4>
+                        <div className="flex items-center gap-2 mt-1">
+                          <div className="flex">
+                            {[...Array(5)].map((_, i) => (
+                              <Star
+                                key={i}
+                                className={`w-4 h-4 ${
+                                  i < r.rating
+                                    ? 'fill-yellow-400 text-yellow-400'
+                                    : 'fill-gray-200 text-gray-200'
+                                }`}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-gray-500">
+                            {new Date(r.createdAt).toLocaleDateString('mn-MN')}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="text-gray-700 leading-relaxed">{r.comment}</p>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
         </div>
       </div>
+
+      {/* Footer Spacer */}
+      <div className="h-20" />
     </div>
   );
 }
