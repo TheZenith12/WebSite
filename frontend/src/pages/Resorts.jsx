@@ -77,11 +77,11 @@ useEffect(() => {
             className="p-4 bg-white rounded-lg shadow flex justify-between items-start"
           >
             <div className="flex gap-4">
-            <img
+          <img
   src={
-    r.image
-      ? `${API_BASE}`
-      : "/"
+    r.images && r.images.length > 0
+      ? r.images[0].url
+      : "/placeholder.jpg"
   }
   onError={(e) => {
     e.target.onerror = null;
@@ -89,8 +89,6 @@ useEffect(() => {
   }}
   className="w-24 h-24 object-cover rounded"
 />
-
-
               <div>
                 <div className="font-semibold text-lg">{r.name}</div>
                 <div className="text-gray-600 text-sm mb-1">
