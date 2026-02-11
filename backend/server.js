@@ -21,9 +21,9 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cors({
     origin: [
+      "http://localhost:5173",
       "https://amaraltws-admin.vercel.app",
       "https://amaraltws.vercel.app",
-      "http://localhost:5173",
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -59,5 +59,14 @@ app.use((err, req, res, next) => {
   console.error("❌ Error:", err.stack);
   res.status(500).json({ message: err.message });
 });
+
+//gh
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+
 
 export default app;
