@@ -4,7 +4,7 @@ function Hero({ searchTerm, setSearchTerm }) {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <section style={{ backgroundImage: "url('/hero.png')" }}>
+    <section style={{ backgroundImage: "url('/website.png')" }}>
   {/* Overlay */}
   <div className="absolute inset-0 bg-black/40"></div>
 
