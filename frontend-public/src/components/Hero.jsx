@@ -4,7 +4,16 @@ function Hero({ searchTerm, setSearchTerm }) {
   const [isFocused, setIsFocused] = useState(false);
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 text-white">
+    <section style={{ backgroundImage: "url('/hero.jpg')" }}>
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-black/40"></div>
+
+  {/* Animated circles */}
+  <div className="absolute inset-0 opacity-20">...</div>
+
+  {/* Content */}
+  <div className="relative z-10">...</div>
+
       {/* Animated Background Circles */}
       <div className="absolute inset-0 opacity-20">
         <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse"></div>
