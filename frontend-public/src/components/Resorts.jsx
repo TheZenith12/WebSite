@@ -14,57 +14,53 @@ function Resorts() {
   const [favorites, setFavorites] = useState(new Set());
 
   // 🏕️ Fetch resorts from backend
-  async function fetchResorts() {
-    setLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/resorts`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  // 🏕️ Fetch resorts from backend
+async function fetchResorts() {
+  setLoading(true);
 
-      if (!res.ok) {
-        throw new Error("Серверээс алдаа ирлээ: " + res.status);
-      }
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/resorts`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      const data = await res.json();
-      console.log("Fetched resorts:", data);
-
-      const resorts = (data.resorts || data).map((r) => {
-        let imgSrc = "";
-
-        if (Array.isArray(r.image)) {
-          imgSrc = r.image[0];
-        } else if (typeof r.image === "string") {
-          imgSrc = r.image;
-        } else if (r.image && typeof r.image === "object") {
-          imgSrc = r.image.url || r.image.path || Object.values(r.image)[0];
-        }
-
-        const fullImg = imgSrc
-          ? /^https?:\/\//i.test(imgSrc)
-            ? imgSrc
-            : `${API_BASE}${imgSrc.startsWith("/") ? imgSrc : `/${imgSrc}`}`
-          : "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80";
-
-        return {
-          ...r,
-          image: fullImg,
-          rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
-          visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
-          location: r.location || "Монгол",
-        };
-      });
-
-      setList(resorts);
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error("Серверээс алдаа ирлээ: " + res.status);
     }
-  }
 
+    const data = await res.json();
+    console.log(data);
+
+   const resorts = (data.resorts || data).map((r) => {
+  const imgs = r.images || [];
+
+  let imgSrc = imgs.length > 0 ? imgs[0] : "";
+
+  const fullImg = imgSrc
+    ? /^https?:\/\//i.test(imgSrc)
+      ? imgSrc
+      : `${API_BASE}/${imgSrc.replace(/^\/+/, "")}`
+    : "https://via.placeholder.com/600x400?text=No+Image";
+
+  return {
+    ...r,
+    image: fullImg,
+    rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
+    visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
+    location: r.location || "Монгол",
+  };
+});
+
+    setList(resorts);
+    setError(null);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setError(err.message);
+  } finally {
+    setLoading(false);
+  }
+}
   useEffect(() => {
     fetchResorts();
   }, []);
@@ -139,24 +135,6 @@ function Resorts() {
       {/* Hero Section */}
       <Hero searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
-      {/* Stats Section */}
-      <section className="container mx-auto px-6 -mt-8 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-            <div className="text-5xl font-bold mb-2">{list.length}+</div>
-            <div className="text-teal-50 text-lg">Амралтын газар</div>
-          </div>
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-            <div className="text-5xl font-bold mb-2">{Math.floor(totalVisitors / 1000)}k+</div>
-            <div className="text-blue-50 text-lg">Жуулчид</div>
-          </div>
-          <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105">
-            <div className="text-5xl font-bold mb-2">4.8★</div>
-            <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
-          </div>
-        </div>
-      </section>
-
       {/* Resorts Grid */}
       <section className="container mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
@@ -172,18 +150,17 @@ function Resorts() {
               <article
                 key={resort._id}
                 className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                onClick={() => setSelectedResort(resort)}
               >
-                {/* Image Container */}
-                <div className="relative h-72 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-br from-teal-400/20 to-blue-500/20 group-hover:opacity-0 transition-opacity duration-500" />
-                  <img
-                    src={resort.image}
-                    alt={resort.name}
-                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
-                    onError={(e) => {
-                      e.currentTarget.src = "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80";
-                    }}
-                  />
+
+                {/* Зураг */}
+                <div className="relative overflow-hidden h-56">
+<img
+  src={resort.image}
+  alt={resort.name}
+  className="w-full h-60 object-cover"
+/>
+
                   
                   {/* Like Button */}
                   <button

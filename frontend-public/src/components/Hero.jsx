@@ -1,10 +1,49 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
-function Hero({ searchTerm, setSearchTerm }) {
-  const [isFocused, setIsFocused] = useState(false);
+function AnimatedCounter({ value, duration = 1500, suffix = "" }) {
+  const [count, setCount] = useState(0);
+
+
+  useEffect(() => {
+    let start = 0;
+    const startTime = performance.now();
+
+    function animate(time) {
+      const progress = Math.min((time - startTime) / duration, 1);
+      const current = Math.floor(progress * value);
+
+      setCount(current);
+
+      if (progress < 1) {
+        requestAnimationFrame(animate);
+      }
+    }
+
+    requestAnimationFrame(animate);
+  }, [value, duration]);
 
   return (
-    <section style={{ backgroundImage: "url('/hero.png')" }}>
+    <span>
+      {count}
+      {suffix}
+    </span>
+  );
+}
+
+function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
+  const [isFocused, setIsFocused] = useState(false);
+const heroImage =
+  list && list.length > 0
+    ? list[0].images?.[0] || list[0].image
+    : "/hero.png";
+
+  return (
+
+<section
+  className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat overflow-hidden"
+  style={{ backgroundImage: `url(${heroImage})` }}
+>
+
   {/* Overlay */}
   <div className="absolute inset-0 bg-black/40"></div>
 
@@ -24,7 +63,7 @@ function Hero({ searchTerm, setSearchTerm }) {
       <div className="relative w-full px-6 py-20 max-w-[1400px] mx-auto">
         <div className="text-center max-w-4xl mx-auto">
           <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight animate-float">
-            Тавтай морилно уу! 👋
+            Тавтай морилно уу! 👋 
           </h2>
           <p className="text-xl md:text-2xl text-teal-50 mb-12">
             Байгаль, тайван амралт, тохилог байр танай хүлээж байна
@@ -34,7 +73,7 @@ function Hero({ searchTerm, setSearchTerm }) {
           <div className="max-w-3xl mx-auto">
             <div className="relative group">
               {/* Animated Gradient Border Glow */}
-              <div className={`absolute -inset-1 bg-gradient-to-r from-teal-400 via-emerald-400 to-cyan-400 rounded-3xl blur-2xl transition-all duration-500 ${
+              <div className={`absolute -inset-1 bg-gradient-to-r rounded-3xl blur-2xl transition-all duration-500 ${
                 isFocused ? 'opacity-75 scale-105' : 'opacity-50 group-hover:opacity-75'
               }`}></div>
               
@@ -103,6 +142,7 @@ function Hero({ searchTerm, setSearchTerm }) {
                     </svg>
                   </button>
                 </div>
+                
 
                 {/* Suggestion Pills (shown when focused and empty) */}
                 {isFocused && !searchTerm && (
@@ -127,6 +167,38 @@ function Hero({ searchTerm, setSearchTerm }) {
                 </svg>
                 <span>Байршил, нэр, эсвэл үнээр хайж болно</span>
               </div>
+     {/* Stats Section */}
+<div className="mt-16">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+    <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter value={4} suffix="+" />
+      </div>
+      <div className="text-teal-50 text-lg">Амралтын газар</div>
+    </div>
+
+    <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter
+          value={1370}  
+          suffix="k+"
+        />
+      </div>
+      <div className="text-blue-50 text-lg">Жуулчид</div>
+    </div>
+
+    <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter value={48} suffix="★" />
+      </div>
+      <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
+    </div>
+
+  </div>
+</div>
+
+              
             </div>
           </div>
         </div>
@@ -139,7 +211,7 @@ function Hero({ searchTerm, setSearchTerm }) {
         </svg>
       </div>
 
-      <style jsx>{`
+      <style>{`
         @keyframes float {
           0%, 100% { transform: translateY(0px); }
           50% { transform: translateY(-20px); }
