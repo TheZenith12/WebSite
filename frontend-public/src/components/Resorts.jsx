@@ -265,14 +265,11 @@ async function fetchResorts() {
           
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Таны амралтын газар энд байна уу?
+              Таны амардаг амралтын газар энд байна уу?
             </h2>
             <p className="text-xl text-teal-50 mb-8 max-w-2xl mx-auto">
-              Өөрийн амралтын газрыг бүртгүүлж, мянга мянган хүмүүст таниулаарай
+              Хэрэв үгүй бол мэдээллээ бидэнд өгч, бүртгүүлж, өөр олон хүнд тус болоорой.
             </p>
-            <button className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105">
-              Амралтын газар нэмэх
-            </button>
           </div>
         </div>
       </section>
@@ -289,26 +286,8 @@ async function fetchResorts() {
                 <span className="text-2xl font-bold text-white">AmraltinGazar</span>
               </div>
               <p className="text-gray-400 leading-relaxed">
-                Монголын хамгийн том амралтын газрын мэдээллийн платформ
+                Танд тохирох амралтын газар энд байгаа гэдэгт найдаж байна.
               </p>
-            </div>
-            
-            <div>
-              <h3 className="text-white font-bold text-lg mb-4">Холбоосууд</h3>
-              <ul className="space-y-3">
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Бидний тухай</a></li>
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Амралтын газрууд</a></li>
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Блог</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-white font-bold text-lg mb-4">Тусламж</h3>
-              <ul className="space-y-3">
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Түгээмэл асуулт</a></li>
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Нөхцөл</a></li>
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Нууцлал</a></li>
-              </ul>
             </div>
             
             <div>
@@ -318,7 +297,7 @@ async function fetchResorts() {
                   <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <span>+976 9999-9999</span>
+                  <span>+976 9135-4449</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
