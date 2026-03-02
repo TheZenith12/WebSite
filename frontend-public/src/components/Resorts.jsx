@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Search, Eye, MapPin, Star, Heart, ChevronRight } from "lucide-react";
 import Header from "./Header";
 import Hero from "./Hero";
+import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -12,6 +13,7 @@ function Resorts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
+  const navigate = useNavigate();
 
   // 🏕️ Fetch resorts from backend
   // 🏕️ Fetch resorts from backend
@@ -270,9 +272,12 @@ async function fetchResorts() {
             <p className="text-xl text-teal-50 mb-8 max-w-2xl mx-auto">
               Өөрийн амралтын газрыг бүртгүүлж, мянга мянган хүмүүст таниулаарай
             </p>
-            <button className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105">
-              Амралтын газар нэмэх
-            </button>
+           <button
+  onClick={() => navigate("/admin/add-resort")}
+  className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105"
+>
+  Амралтын газар нэмэх
+</button>
           </div>
         </div>
       </section>

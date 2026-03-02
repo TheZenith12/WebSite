@@ -11,6 +11,8 @@ import connectDB from "./src/config/db.js";
 import authRoutes from "./src/routes/auth.js";
 import resortRoutes from "./src/routes/resorts.js";
 import fileRoutes from "./src/routes/fileRoutes.js";
+import visitorRoutes from "./src/routes/visitor.js";
+import resortRoutes from "./src/routes/resorts.js";
 
 const app = express();
 
@@ -49,6 +51,7 @@ app.get("/api/stats", (req, res) => {
 app.use("/api/admin", authRoutes);
 app.use("/api/admin/resorts", resortRoutes);
 app.use("/api/admin/files", fileRoutes);
+app.use("/api", visitorRoutes);
 
 // Root
 app.get("/", (req, res) => {

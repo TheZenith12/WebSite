@@ -1,7 +1,7 @@
-import React, { useState } from "react";
-import Header from "./components/Header";
-import Hero from "./components/Hero";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Resorts from "./components/Resorts";
+import AddResort from "./Pages/AddResort";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState('');

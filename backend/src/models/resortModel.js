@@ -18,17 +18,16 @@ const resortSchema = new mongoose.Schema(
 
     price: Number,
 
-    // 🖼️ Зурагнууд
-    images: {
-      type: [String], // Cloudinary URL array
-      default: [],
-    },
+  status: {
+    type: String,
+    enum: ["pending", "approved"],
+    default: "pending",
+  },
 
-    // 🎥 Видео
-    videos: {
-      type: [String], // Cloudinary video URL array
-      default: [],
-    },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
   },
   { timestamps: true }
 );

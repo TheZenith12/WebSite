@@ -25,4 +25,19 @@ router.put(
 
 router.delete("/:id", deleteResort);
 
+router.post("/", upload.array("images"), async (req, res) => {
+  try {
+    const resort = new Resort({
+      ...req.body,
+      images: req.files.map((file) => file.path),
+      status: "pending", // explicitly өгч болно
+    });
+
+    await resort.save();
+    res.status(201).json({ message: "Submitted for review" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;

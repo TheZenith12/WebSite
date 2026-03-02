@@ -35,7 +35,7 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
 const heroImage =
   list && list.length > 0
     ? list[0].images?.[0] || list[0].image
-    : "/hero.png";
+    : "13.png";
 
   return (
 
