@@ -32,18 +32,14 @@ function AnimatedCounter({ value, duration = 1500, suffix = "" }) {
 
 function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
   const [isFocused, setIsFocused] = useState(false);
-<<<<<<< HEAD
-const heroImage =
-  list && list.length > 0
-    ? list[0].images?.[0] || list[0].image
-    : "13.png";
-=======
+
   const heroImage =
     list && list.length > 0
       ? list[0].images?.[0] || list[0].image
-      : "/hero.png";
->>>>>>> 66b0c2e4df4d99bab46e69e580a8d7cd82deecd5
+      : "13.png";
 
+  // rest of your component
+}
   return (
 
     <section
@@ -233,6 +229,6 @@ const heroImage =
       `}</style>
     </section>
   );
-}
+
 
 export default Hero;
