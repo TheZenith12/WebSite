@@ -32,29 +32,26 @@ function AnimatedCounter({ value, duration = 1500, suffix = "" }) {
 
 function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
   const [isFocused, setIsFocused] = useState(false);
+const heroImage =
+  list && list.length > 0
+    ? list[0].images?.[0] || list[0].image
+    : "/hero.png";
 
-  const heroImage =
-    list && list.length > 0
-      ? list[0].images?.[0] || list[0].image
-      : "13.png";
-
-  // rest of your component
-}
   return (
 
-    <section
-      className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat overflow-hidden"
-      style={{ backgroundImage: `url(${heroImage})` }}
-    >
+<section
+  className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat overflow-hidden"
+  style={{ backgroundImage: `url(${heroImage})` }}
+>
 
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40"></div>
+  {/* Overlay */}
+  <div className="absolute inset-0 bg-black/40"></div>
 
-      {/* Animated circles */}
-      <div className="absolute inset-0 opacity-20">...</div>
+  {/* Animated circles */}
+  <div className="absolute inset-0 opacity-20">...</div>
 
-      {/* Content */}
-      <div className="relative z-10">...</div>
+  {/* Content */}
+  <div className="relative z-10">...</div>
 
       {/* Animated Background Circles */}
       <div className="absolute inset-0 opacity-20">
@@ -66,37 +63,40 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
       <div className="relative w-full px-6 py-20 max-w-[1400px] mx-auto">
         <div className="text-center max-w-4xl mx-auto">
           <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight animate-float">
-            Тавтай морилно уу! 👋
+            Тавтай морилно уу! 👋 
           </h2>
           <p className="text-xl md:text-2xl text-teal-50 mb-12">
             Байгаль, тайван амралт, тохилог байр танай хүлээж байна
           </p>
-
+          
           {/* Enhanced Search Bar */}
           <div className="max-w-3xl mx-auto">
             <div className="relative group">
               {/* Animated Gradient Border Glow */}
-              <div className={`absolute -inset-1 bg-gradient-to-r rounded-3xl blur-2xl transition-all duration-500 ${isFocused ? 'opacity-75 scale-105' : 'opacity-50 group-hover:opacity-75'
-                }`}></div>
-
+              <div className={`absolute -inset-1 bg-gradient-to-r rounded-3xl blur-2xl transition-all duration-500 ${
+                isFocused ? 'opacity-75 scale-105' : 'opacity-50 group-hover:opacity-75'
+              }`}></div>
+              
               {/* Search Container */}
-              <div className={`relative bg-white rounded-3xl shadow-2xl transition-all duration-300 ${isFocused ? 'ring-4 ring-white/40' : ''
-                }`}>
+              <div className={`relative bg-white rounded-3xl shadow-2xl transition-all duration-300 ${
+                isFocused ? 'ring-4 ring-white/40' : ''
+              }`}>
                 <div className="flex items-center gap-3 p-2">
                   {/* Search Icon with Animation */}
                   <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl ml-2 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <svg
-                      className={`w-6 h-6 text-white transition-transform duration-500 ${isFocused ? 'scale-110 rotate-90' : ''
-                        }`}
-                      fill="none"
-                      stroke="currentColor"
+                    <svg 
+                      className={`w-6 h-6 text-white transition-transform duration-500 ${
+                        isFocused ? 'scale-110 rotate-90' : ''
+                      }`}
+                      fill="none" 
+                      stroke="currentColor" 
                       viewBox="0 0 24 24"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2.5"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      <path 
+                        strokeLinecap="round" 
+                        strokeLinejoin="round" 
+                        strokeWidth="2.5" 
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" 
                       />
                     </svg>
                   </div>
@@ -118,17 +118,17 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
                       onClick={() => setSearchTerm('')}
                       className="flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-300 mr-2 group/clear"
                     >
-                      <svg
-                        className="w-5 h-5 text-gray-600 group-hover/clear:rotate-90 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
+                      <svg 
+                        className="w-5 h-5 text-gray-600 group-hover/clear:rotate-90 transition-transform duration-300" 
+                        fill="none" 
+                        stroke="currentColor" 
                         viewBox="0 0 24 24"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M6 18L18 6M6 6l12 12"
+                        <path 
+                          strokeLinecap="round" 
+                          strokeLinejoin="round" 
+                          strokeWidth="2" 
+                          d="M6 18L18 6M6 6l12 12" 
                         />
                       </svg>
                     </button>
@@ -142,7 +142,7 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
                     </svg>
                   </button>
                 </div>
-
+                
 
                 {/* Suggestion Pills (shown when focused and empty) */}
                 {isFocused && !searchTerm && (
@@ -167,38 +167,38 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
                 </svg>
                 <span>Байршил, нэр, эсвэл үнээр хайж болно</span>
               </div>
-              {/* Stats Section */}
-              <div className="mt-16">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+     {/* Stats Section */}
+<div className="mt-16">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
 
-                  <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                    <div className="text-5xl font-bold mb-2">
-                      <AnimatedCounter value={4} suffix="+" />
-                    </div>
-                    <div className="text-teal-50 text-lg">Амралтын газар</div>
-                  </div>
+    <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter value={4} suffix="+" />
+      </div>
+      <div className="text-teal-50 text-lg">Амралтын газар</div>
+    </div>
 
-                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                    <div className="text-5xl font-bold mb-2">
-                      <AnimatedCounter
-                        value={1370}
-                        suffix="k+"
-                      />
-                    </div>
-                    <div className="text-blue-50 text-lg">Жуулчид</div>
-                  </div>
+    <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter
+          value={1370}  
+          suffix="k+"
+        />
+      </div>
+      <div className="text-blue-50 text-lg">Жуулчид</div>
+    </div>
 
-                  <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                    <div className="text-5xl font-bold mb-2">
-                      <AnimatedCounter value={48} suffix="★" />
-                    </div>
-                    <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
-                  </div>
+    <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter value={48} suffix="★" />
+      </div>
+      <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
+    </div>
 
-                </div>
-              </div>
+  </div>
+</div>
 
-
+              
             </div>
           </div>
         </div>
@@ -229,6 +229,6 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
       `}</style>
     </section>
   );
-
+}
 
 export default Hero;

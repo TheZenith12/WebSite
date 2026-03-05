@@ -1,4 +1,5 @@
 import express from "express";
+import multer from "multer";
 import {
   getResorts,
   getResortById,
@@ -8,6 +9,17 @@ import {
 } from "../controllers/resortController.js";
 
 const router = express.Router();
+
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads/"); // backend/uploads/
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
+});
+
+const upload = multer({ storage });
 
 // Routes
 router.get("/", getResorts);
@@ -27,16 +39,12 @@ router.delete("/:id", deleteResort);
 
 router.post("/", upload.array("images"), async (req, res) => {
   try {
-    const resort = new Resort({
-      ...req.body,
-      images: req.files.map((file) => file.path),
-      status: "pending", // explicitly өгч болно
+    res.json({
+      message: "Upload OK",
+      files: req.files,
     });
-
-    await resort.save();
-    res.status(201).json({ message: "Submitted for review" });
   } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ message: err.message });
   }
 });
 
