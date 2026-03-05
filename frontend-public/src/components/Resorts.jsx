@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Search, Eye, MapPin, Star, Heart, ChevronRight } from "lucide-react";
 import Header from "./Header";
 import Hero from "./Hero";
-import { useNavigate } from "react-router-dom";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
@@ -13,56 +12,55 @@ function Resorts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
-  const navigate = useNavigate();
 
   // 🏕️ Fetch resorts from backend
   // 🏕️ Fetch resorts from backend
-  async function fetchResorts() {
-    setLoading(true);
+async function fetchResorts() {
+  setLoading(true);
 
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/resorts`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/resorts`, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
-      if (!res.ok) {
-        throw new Error("Серверээс алдаа ирлээ: " + res.status);
-      }
-
-      const data = await res.json();
-      console.log(data);
-
-      const resorts = (data.resorts || data).map((r) => {
-        const imgs = r.images || [];
-
-        let imgSrc = imgs.length > 0 ? imgs[0] : "";
-
-        const fullImg = imgSrc
-          ? /^https?:\/\//i.test(imgSrc)
-            ? imgSrc
-            : `${API_BASE}/${imgSrc.replace(/^\/+/, "")}`
-          : "https://via.placeholder.com/600x400?text=No+Image";
-
-        return {
-          ...r,
-          image: fullImg,
-          rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
-          visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
-          location: r.location || "Монгол",
-        };
-      });
-
-      setList(resorts);
-      setError(null);
-    } catch (err) {
-      console.error("Fetch error:", err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!res.ok) {
+      throw new Error("Серверээс алдаа ирлээ: " + res.status);
     }
+
+    const data = await res.json();
+    console.log(data);
+
+   const resorts = (data.resorts || data).map((r) => {
+  const imgs = r.images || [];
+
+  let imgSrc = imgs.length > 0 ? imgs[0] : "";
+
+  const fullImg = imgSrc
+    ? /^https?:\/\//i.test(imgSrc)
+      ? imgSrc
+      : `${API_BASE}/${imgSrc.replace(/^\/+/, "")}`
+    : "https://via.placeholder.com/600x400?text=No+Image";
+
+  return {
+    ...r,
+    image: fullImg,
+    rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
+    visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
+    location: r.location || "Монгол",
+  };
+});
+
+    setList(resorts);
+    setError(null);
+  } catch (err) {
+    console.error("Fetch error:", err);
+    setError(err.message);
+  } finally {
+    setLoading(false);
   }
+}
   useEffect(() => {
     fetchResorts();
   }, []);
@@ -147,7 +145,7 @@ function Resorts() {
         </div>
 
         {filteredList.length > 0 ? (
-          <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
             {filteredList.map((resort) => (
               <article
                 key={resort._id}
@@ -156,75 +154,76 @@ function Resorts() {
               >
 
                 {/* Зураг */}
-                <div className="relative overflow-hidden h-32 sm:h-56">
-                  <img
-                    src={resort.image}
-                    alt={resort.name}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="relative overflow-hidden h-56">
+<img
+  src={resort.image}
+  alt={resort.name}
+  className="w-full h-60 object-cover"
+/>
 
-
+                  
                   {/* Like Button */}
                   <button
                     onClick={(e) => toggleFavorite(resort._id, e)}
-                    className="absolute top-2 right-2 sm:top-4 sm:right-4 w-8 h-8 sm:w-12 sm:h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300"
+                    className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300"
                   >
                     <Heart
-                      className={`w-4 h-4 sm:w-6 sm:h-6 transition-colors duration-300 ${favorites.has(resort._id)
+                      className={`w-6 h-6 transition-colors duration-300 ${
+                        favorites.has(resort._id)
                           ? 'fill-red-500 text-red-500'
                           : 'text-gray-600'
-                        }`}
+                      }`}
                     />
                   </button>
 
                   {/* Category Badge */}
-                  <div className="absolute top-2 left-2 sm:top-4 sm:left-4 px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg">
+                  <div className="absolute top-4 left-4 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-full text-sm font-semibold shadow-lg">
                     Жуулчны бааз
                   </div>
 
                   {/* Views Counter */}
-                  <div className="absolute bottom-2 left-2 sm:bottom-4 sm:left-4 px-2 py-1 sm:px-3 sm:py-1.5 bg-black/50 backdrop-blur-sm text-white rounded-full text-xs sm:text-sm flex items-center gap-1 sm:gap-2">
-                    <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                  <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-black/50 backdrop-blur-sm text-white rounded-full text-sm flex items-center gap-2">
+                    <Eye className="w-4 h-4" />
                     {resort.visitors?.toLocaleString() || '2.5k'}
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-3 sm:p-6">
+                <div className="p-6">
                   {/* Header */}
-                  <div className="flex items-start justify-between mb-2 sm:mb-3">
+                  <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
-                      <h3 className="text-sm sm:text-xl font-bold text-gray-900 mb-0.5 sm:mb-1 group-hover:text-teal-600 transition-colors line-clamp-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-teal-600 transition-colors">
                         {resort.name}
                       </h3>
-                      <div className="flex items-center gap-1 text-gray-600 text-xs sm:text-sm">
-                        <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-teal-500 flex-shrink-0" />
-                        <span className="truncate">{resort.location}</span>
+                      <div className="flex items-center gap-1.5 text-gray-600 text-sm">
+                        <MapPin className="w-4 h-4 text-teal-500" />
+                        {resort.location}
                       </div>
                     </div>
                   </div>
 
                   {/* Rating */}
-                  <div className="flex items-center gap-1 sm:gap-2 mb-2 sm:mb-4">
-                    <div className="flex items-center gap-0.5 sm:gap-1 px-2 py-1 sm:px-3 sm:py-1.5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-lg">
-                      <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white" />
-                      <span className="text-white font-semibold text-xs sm:text-sm">{resort.rating}</span>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-lg">
+                      <Star className="w-4 h-4 fill-white text-white" />
+                      <span className="text-white font-semibold text-sm">{resort.rating}</span>
                     </div>
-                    <span className="text-gray-500 text-xs hidden sm:inline">({resort.visitors || 2068} үнэлгээ)</span>
+                    <span className="text-gray-500 text-sm">({resort.visitors || 2068} үнэлгээ)</span>
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-end justify-between mb-2 sm:mb-4 pb-2 sm:pb-4 border-b border-gray-100">
+                  <div className="flex items-end justify-between mb-4 pb-4 border-b border-gray-100">
                     <div>
-                      <span className="text-lg sm:text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+                      <span className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
                         {resort.price ? `${parseInt(resort.price).toLocaleString()}₮` : "—"}
                       </span>
-                      <span className="text-gray-500 text-xs ml-1">/ хоног</span>
+                      <span className="text-gray-500 text-sm ml-2">/ хоног</span>
                     </div>
                   </div>
 
-                  {/* Amenities - hidden on mobile */}
-                  <div className="hidden sm:flex flex-wrap gap-2 mb-4">
+                  {/* Amenities */}
+                  <div className="flex flex-wrap gap-2 mb-4">
                     <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">
                       Халуун рашаан
                     </span>
@@ -239,10 +238,10 @@ function Resorts() {
                   {/* CTA Button */}
                   <Link
                     to={`/details/${resort._id}`}
-                    className="w-full py-2 sm:py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-semibold flex items-center justify-center gap-1 sm:gap-2 transition-all duration-300 shadow-lg hover:shadow-xl group text-xs sm:text-base"
+                    className="w-full py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl group"
                   >
-                    Дэлгэрэнгүй
-                    <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                    Дэлгэрэнгүй үзэх
+                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Link>
                 </div>
               </article>
@@ -263,23 +262,17 @@ function Resorts() {
             <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
           </div>
-
+          
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Таны амардаг амралтын газар энд байна уу?
+              Таны амралтын газар энд байна уу?
             </h2>
             <p className="text-xl text-teal-50 mb-8 max-w-2xl mx-auto">
-              Хэрэв үгүй бол мэдээллээ бидэнд өгч, бүртгүүлж, өөр олон хүнд тус болоорой.
+              Өөрийн амралтын газрыг бүртгүүлж, мянга мянган хүмүүст таниулаарай
             </p>
-
-           <button
-  onClick={() => navigate("/admin/add-resort")}
-  className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105"
->
-  Амралтын газар нэмэх
-</button>
-
-
+            <button className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105">
+              Амралтын газар нэмэх
+            </button>
           </div>
         </div>
       </section>
@@ -296,10 +289,28 @@ function Resorts() {
                 <span className="text-2xl font-bold text-white">AmraltinGazar</span>
               </div>
               <p className="text-gray-400 leading-relaxed">
-                Танд тохирох амралтын газар энд байгаа гэдэгт найдаж байна.
+                Монголын хамгийн том амралтын газрын мэдээллийн платформ
               </p>
             </div>
-
+            
+            <div>
+              <h3 className="text-white font-bold text-lg mb-4">Холбоосууд</h3>
+              <ul className="space-y-3">
+                <li><a href="#" className="hover:text-teal-400 transition-colors">Бидний тухай</a></li>
+                <li><a href="#" className="hover:text-teal-400 transition-colors">Амралтын газрууд</a></li>
+                <li><a href="#" className="hover:text-teal-400 transition-colors">Блог</a></li>
+              </ul>
+            </div>
+            
+            <div>
+              <h3 className="text-white font-bold text-lg mb-4">Тусламж</h3>
+              <ul className="space-y-3">
+                <li><a href="#" className="hover:text-teal-400 transition-colors">Түгээмэл асуулт</a></li>
+                <li><a href="#" className="hover:text-teal-400 transition-colors">Нөхцөл</a></li>
+                <li><a href="#" className="hover:text-teal-400 transition-colors">Нууцлал</a></li>
+              </ul>
+            </div>
+            
             <div>
               <h3 className="text-white font-bold text-lg mb-4">Холбогдох</h3>
               <ul className="space-y-3">
@@ -307,7 +318,7 @@ function Resorts() {
                   <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <span>+976 9135-4449</span>
+                  <span>+976 9999-9999</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -318,7 +329,7 @@ function Resorts() {
               </ul>
             </div>
           </div>
-
+          
           <div className="border-t border-gray-800 pt-8 text-center text-gray-500">
             <p>© 2026 AmraltinGazar. Бүх эрх хуулиар хамгаалагдсан.</p>
           </div>
