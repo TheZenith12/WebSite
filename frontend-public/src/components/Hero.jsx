@@ -29,143 +29,219 @@ function AnimatedCounter({ value, duration = 1500, suffix = "" }) {
 
 function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
   const [isFocused, setIsFocused] = useState(false);
-
   const heroImage =
     list && list.length > 0
       ? list[0].images?.[0] || list[0].image
-      : "13.png";
+      : "/13.png";
 
-  return (
-    <section
-      className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat overflow-hidden"
-      style={{ backgroundImage: `url(${heroImage})` }}
-    >
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/40"></div>
 
-      {/* Animated Background Circles */}
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-      </div>
+      return (
 
-      {/* Content */}
-      <div className="relative w-full px-6 py-20 max-w-[1400px] mx-auto">
-        <div className="text-center max-w-4xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight animate-float text-white">
-            Тавтай морилно уу! 👋
-          </h2>
-          <p className="text-xl md:text-2xl text-teal-50 mb-12">
-            Байгаль, тайван амралт, тохилог байр танай хүлээж байна
-          </p>
+      <section
+        className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat overflow-hidden"
+        style={{ backgroundImage: `url(${heroImage})` }}
+      >
 
-          {/* Enhanced Search Bar */}
-          <div className="max-w-3xl mx-auto">
-            <div className="relative group">
-              {/* Animated Gradient Border Glow */}
-              <div className={`absolute -inset-1 bg-gradient-to-r rounded-3xl blur-2xl transition-all duration-500 ${isFocused ? 'opacity-75 scale-105' : 'opacity-50 group-hover:opacity-75'}`}></div>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/40"></div>
 
-              {/* Search Container */}
-              <div className={`relative bg-white rounded-3xl shadow-2xl transition-all duration-300 ${isFocused ? 'ring-4 ring-white/40' : ''}`}>
-                <div className="flex items-center gap-3 p-2">
-                  {/* Search Icon */}
-                  <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl ml-2 shadow-lg group-hover:scale-110 transition-transform duration-300">
-                    <svg
-                      className={`w-6 h-6 text-white transition-transform duration-500 ${isFocused ? 'scale-110 rotate-90' : ''}`}
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </div>
+        {/* Animated circles */}
+        <div className="absolute inset-0 opacity-20">...</div>
 
-                  {/* Input Field */}
-                  <input
-                    type="text"
-                    placeholder="Хаана амрах вэ? 🏕️"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    className="flex-1 px-4 py-4 bg-transparent text-gray-900 placeholder-gray-400 outline-none text-lg font-medium"
-                  />
+        {/* Content */}
+        <div className="relative z-10">...</div>
 
-                  {/* Clear Button */}
-                  {searchTerm && (
-                    <button
-                      onClick={() => setSearchTerm('')}
-                      className="flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-300 mr-2 group/clear"
-                    >
-                      <svg
-                        className="w-5 h-5 text-gray-600 group-hover/clear:rotate-90 transition-transform duration-300"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+
+        {/* Animated Background Circles */}
+        <div className="absolute inset-0 opacity-20">
+          <div className="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+        </div>
+
+        {/* Content */}
+        <div className="relative w-full px-6 py-20 max-w-[1400px] mx-auto">
+
+            <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight animate-float text-white">
+              Тавтай морилно уу! 👋
+              </h2>
+              <p className="text-xl md:text-2xl text-teal-50 mb-12">
+                Байгаль, тайван амралт, тохилог байр танай хүлээж байна
+              </p>
+
+              {/* Enhanced Search Bar */}
+              <div className="max-w-3xl mx-auto">
+                <div className="relative group">
+                  {/* Animated Gradient Border Glow */}
+
+                  <div className={`absolute -inset-1 bg-gradient-to-r rounded-3xl blur-2xl transition-all duration-500 ${isFocused ? 'opacity-75 scale-105' : 'opacity-50 group-hover:opacity-75'}`}></div>
+
+                  {/* Search Container */}
+                  <div className={`relative bg-white rounded-3xl shadow-2xl transition-all duration-300 ${isFocused ? 'ring-4 ring-white/40' : ''}`}>
+
+                    <div className={`absolute -inset-1 bg-gradient-to-r rounded-3xl blur-2xl transition-all duration-500 ${isFocused ? 'opacity-75 scale-105' : 'opacity-50 group-hover:opacity-75'
+                      }`}></div>
+
+                    {/* Search Container */}
+                    <div className={`relative bg-white rounded-3xl shadow-2xl transition-all duration-300 ${isFocused ? 'ring-4 ring-white/40' : ''
+                      }`}>
+
+                      <div className="flex items-center gap-3 p-2">
+                        {/* Search Icon */}
+                        <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl ml-2 shadow-lg group-hover:scale-110 transition-transform duration-300">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+
+                            <svg
+                              className={`w-6 h-6 text-white transition-transform duration-500 ${isFocused ? 'scale-110 rotate-90' : ''
+                                }`}
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2.5"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                              />
+
+                            </svg>
+                        </div>
+
+                        {/* Input Field */}
+                        <input
+                          type="text"
+                          placeholder="Хаана амрах вэ? 🏕️"
+                          value={searchTerm}
+                          onChange={(e) => setSearchTerm(e.target.value)}
+                          onFocus={() => setIsFocused(true)}
+                          onBlur={() => setIsFocused(false)}
+                          className="flex-1 px-4 py-4 bg-transparent text-gray-900 placeholder-gray-400 outline-none text-lg font-medium"
+                        />
+
+                        {/* Clear Button */}
+                        {searchTerm && (
+                          <button
+                            onClick={() => setSearchTerm('')}
+                            className="flex items-center justify-center w-10 h-10 bg-gray-100 hover:bg-gray-200 rounded-xl transition-all duration-300 mr-2 group/clear"
+                          >
+                            <svg
+                              className="w-5 h-5 text-gray-600 group-hover/clear:rotate-90 transition-transform duration-300"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M6 18L18 6M6 6l12 12"
+                              />
+
+                            </svg>
+                          </button>
+                        )}
+
+                        {/* Search Button */}
+                        <button className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-2xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mr-1">
+                          <span className="hidden md:inline">Хайх</span>
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                          </svg>
+                        </button>
+                      </div>
+
+
+                      {/* Suggestion Pills */}
+
+
+
+                      {/* Suggestion Pills (shown when focused and empty) */}
+
+                      {isFocused && !searchTerm && (
+                        <div className="px-6 pb-4 flex flex-wrap gap-2 animate-fadeIn">
+                          {['Төв аймаг', 'Архангай', 'Өвөрхангай', 'Хэнтий'].map((suggestion, i) => (
+                            <button
+                              key={i}
+                              onClick={() => setSearchTerm(suggestion)}
+                              className="px-4 py-2 bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-teal-700 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
+                            >
+                              {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Search Tips */}
+                    <div className="mt-4 flex items-center justify-center gap-2 text-teal-100 text-sm">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                    </button>
-                  )}
-
-                  {/* Search Button */}
-                  <button className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-2xl font-bold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 mr-1">
-                    <span className="hidden md:inline">Хайх</span>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </button>
-                </div>
-
-                {/* Suggestion Pills */}
-                {isFocused && !searchTerm && (
-                  <div className="px-6 pb-4 flex flex-wrap gap-2 animate-fadeIn">
-                    {['Төв аймаг', 'Архангай', 'Өвөрхангай', 'Хэнтий'].map((suggestion, i) => (
-                      <button
-                        key={i}
-                        onClick={() => setSearchTerm(suggestion)}
-                        className="px-4 py-2 bg-gradient-to-r from-teal-50 to-emerald-50 hover:from-teal-100 hover:to-emerald-100 text-teal-700 rounded-full text-sm font-semibold transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
-                      >
-                        {suggestion}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Search Tips */}
-              <div className="mt-4 flex items-center justify-center gap-2 text-teal-100 text-sm">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <span>Байршил, нэр, эсвэл үнээр хайж болно</span>
-              </div>
-
-              {/* Stats Section */}
-              <div className="mt-16">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-                  <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                    <div className="text-5xl font-bold mb-2">
-                      <AnimatedCounter value={4} suffix="+" />
+                      <span>Байршил, нэр, эсвэл үнээр хайж болно</span>
                     </div>
-                    <div className="text-teal-50 text-lg">Амралтын газар</div>
-                  </div>
 
-                  <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                    <div className="text-5xl font-bold mb-2">
-                      <AnimatedCounter value={1370} suffix="k+" />
-                    </div>
-                    <div className="text-blue-50 text-lg">Жуулчид</div>
-                  </div>
+                    {/* Stats Section */}
+                    <div className="mt-16">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                        <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+                          <div className="text-5xl font-bold mb-2">
+                            <AnimatedCounter value={4} suffix="+" />
+                          </div>
+                          <div className="text-teal-50 text-lg">Амралтын газар</div>
+                        </div>
 
-                  <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                    <div className="text-5xl font-bold mb-2">
-                      <AnimatedCounter value={48} suffix="★" />
+                        <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+                          <div className="text-5xl font-bold mb-2">
+                            <AnimatedCounter value={1370} suffix="k+" />
+                          </div>
+                          <div className="text-blue-50 text-lg">Жуулчид</div>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+                          <div className="text-5xl font-bold mb-2">
+                            <AnimatedCounter value={48} suffix="★" />
+                          </div>
+                          <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
-                  </div>
-                </div>
-              </div>
+
+     {/* Stats Section */}
+<div className="mt-16">
+  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+
+    <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter value={4} suffix="+" />
+      </div>
+      <div className="text-teal-50 text-lg">Амралтын газар</div>
+    </div>
+
+    <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter
+          value={1370}
+          suffix="k+"
+        />
+      </div>
+      <div className="text-blue-50 text-lg">Жуулчид</div>
+    </div>
+
+    <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
+      <div className="text-5xl font-bold mb-2">
+        <AnimatedCounter value={48} suffix="★" />
+      </div>
+      <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
+    </div>
+
+  </div>
+</div>
+
+
+
             </div>
           </div>
         </div>
