@@ -171,8 +171,8 @@ function Resorts() {
                   >
                     <Heart
                       className={`w-4 h-4 sm:w-6 sm:h-6 transition-colors duration-300 ${favorites.has(resort._id)
-                          ? 'fill-red-500 text-red-500'
-                          : 'text-gray-600'
+                        ? 'fill-red-500 text-red-500'
+                        : 'text-gray-600'
                         }`}
                     />
                   </button>
@@ -272,12 +272,12 @@ function Resorts() {
               Хэрэв үгүй бол мэдээллээ бидэнд өгч, бүртгүүлж, өөр олон хүнд тус болоорой.
             </p>
 
-           <button
-  onClick={() => navigate("/admin/add-resort")}
-  className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105"
->
-  Амралтын газар нэмэх
-</button>
+            <button
+              onClick={() => navigate("/admin/add-resort")}
+              className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105"
+            >
+              Амралтын газар нэмэх
+            </button>
 
 
           </div>

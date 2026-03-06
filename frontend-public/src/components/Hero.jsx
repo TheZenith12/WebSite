@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 function AnimatedCounter({ value, duration = 1500, suffix = "" }) {
   const [count, setCount] = useState(0);
 
-
   useEffect(() => {
     let start = 0;
     const startTime = performance.now();
@@ -11,9 +10,7 @@ function AnimatedCounter({ value, duration = 1500, suffix = "" }) {
     function animate(time) {
       const progress = Math.min((time - startTime) / duration, 1);
       const current = Math.floor(progress * value);
-
       setCount(current);
-
       if (progress < 1) {
         requestAnimationFrame(animate);
       }
@@ -38,23 +35,13 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
       ? list[0].images?.[0] || list[0].image
       : "13.png";
 
-  // rest of your component
-}
   return (
-
     <section
       className="relative w-full min-h-screen bg-cover bg-center bg-no-repeat overflow-hidden"
       style={{ backgroundImage: `url(${heroImage})` }}
     >
-
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/40"></div>
-
-      {/* Animated circles */}
-      <div className="absolute inset-0 opacity-20">...</div>
-
-      {/* Content */}
-      <div className="relative z-10">...</div>
 
       {/* Animated Background Circles */}
       <div className="absolute inset-0 opacity-20">
@@ -65,7 +52,7 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
       {/* Content */}
       <div className="relative w-full px-6 py-20 max-w-[1400px] mx-auto">
         <div className="text-center max-w-4xl mx-auto">
-          <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight animate-float">
+          <h2 className="text-5xl md:text-6xl font-bold mb-6 leading-tight animate-float text-white">
             Тавтай морилно уу! 👋
           </h2>
           <p className="text-xl md:text-2xl text-teal-50 mb-12">
@@ -76,28 +63,20 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
           <div className="max-w-3xl mx-auto">
             <div className="relative group">
               {/* Animated Gradient Border Glow */}
-              <div className={`absolute -inset-1 bg-gradient-to-r rounded-3xl blur-2xl transition-all duration-500 ${isFocused ? 'opacity-75 scale-105' : 'opacity-50 group-hover:opacity-75'
-                }`}></div>
+              <div className={`absolute -inset-1 bg-gradient-to-r rounded-3xl blur-2xl transition-all duration-500 ${isFocused ? 'opacity-75 scale-105' : 'opacity-50 group-hover:opacity-75'}`}></div>
 
               {/* Search Container */}
-              <div className={`relative bg-white rounded-3xl shadow-2xl transition-all duration-300 ${isFocused ? 'ring-4 ring-white/40' : ''
-                }`}>
+              <div className={`relative bg-white rounded-3xl shadow-2xl transition-all duration-300 ${isFocused ? 'ring-4 ring-white/40' : ''}`}>
                 <div className="flex items-center gap-3 p-2">
-                  {/* Search Icon with Animation */}
+                  {/* Search Icon */}
                   <div className="flex items-center justify-center w-14 h-14 bg-gradient-to-br from-teal-500 to-emerald-500 rounded-2xl ml-2 shadow-lg group-hover:scale-110 transition-transform duration-300">
                     <svg
-                      className={`w-6 h-6 text-white transition-transform duration-500 ${isFocused ? 'scale-110 rotate-90' : ''
-                        }`}
+                      className={`w-6 h-6 text-white transition-transform duration-500 ${isFocused ? 'scale-110 rotate-90' : ''}`}
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2.5"
-                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                      />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </div>
 
@@ -112,7 +91,7 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
                     className="flex-1 px-4 py-4 bg-transparent text-gray-900 placeholder-gray-400 outline-none text-lg font-medium"
                   />
 
-                  {/* Clear Button (when typing) */}
+                  {/* Clear Button */}
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm('')}
@@ -124,12 +103,7 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth="2"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
                   )}
@@ -143,8 +117,7 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
                   </button>
                 </div>
 
-
-                {/* Suggestion Pills (shown when focused and empty) */}
+                {/* Suggestion Pills */}
                 {isFocused && !searchTerm && (
                   <div className="px-6 pb-4 flex flex-wrap gap-2 animate-fadeIn">
                     {['Төв аймаг', 'Архангай', 'Өвөрхангай', 'Хэнтий'].map((suggestion, i) => (
@@ -160,17 +133,17 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
                 )}
               </div>
 
-              {/* Search Tips Text */}
+              {/* Search Tips */}
               <div className="mt-4 flex items-center justify-center gap-2 text-teal-100 text-sm">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <span>Байршил, нэр, эсвэл үнээр хайж болно</span>
               </div>
+
               {/* Stats Section */}
               <div className="mt-16">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
-
                   <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
                     <div className="text-5xl font-bold mb-2">
                       <AnimatedCounter value={4} suffix="+" />
@@ -180,10 +153,7 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
 
                   <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
                     <div className="text-5xl font-bold mb-2">
-                      <AnimatedCounter
-                        value={1370}
-                        suffix="k+"
-                      />
+                      <AnimatedCounter value={1370} suffix="k+" />
                     </div>
                     <div className="text-blue-50 text-lg">Жуулчид</div>
                   </div>
@@ -194,11 +164,8 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
                     </div>
                     <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
                   </div>
-
                 </div>
               </div>
-
-
             </div>
           </div>
         </div>
@@ -229,6 +196,6 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
       `}</style>
     </section>
   );
-
+}
 
 export default Hero;
