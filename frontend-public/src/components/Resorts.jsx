@@ -15,52 +15,52 @@ function Resorts() {
 
   // 🏕️ Fetch resorts from backend
   // 🏕️ Fetch resorts from backend
-async function fetchResorts() {
-  setLoading(true);
+  async function fetchResorts() {
+    setLoading(true);
 
-  try {
-    const res = await fetch(`${API_BASE}/api/admin/resorts`, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    try {
+      const res = await fetch(`${API_BASE}/api/admin/resorts`, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
 
-    if (!res.ok) {
-      throw new Error("Серверээс алдаа ирлээ: " + res.status);
+      if (!res.ok) {
+        throw new Error("Серверээс алдаа ирлээ: " + res.status);
+      }
+
+      const data = await res.json();
+      console.log(data);
+
+      const resorts = (data.resorts || data).map((r) => {
+        const imgs = r.images || [];
+
+        let imgSrc = imgs.length > 0 ? imgs[0] : "";
+
+        const fullImg = imgSrc
+          ? /^https?:\/\//i.test(imgSrc)
+            ? imgSrc
+            : `${API_BASE}/${imgSrc.replace(/^\/+/, "")}`
+          : "https://via.placeholder.com/600x400?text=No+Image";
+
+        return {
+          ...r,
+          image: fullImg,
+          rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
+          visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
+          location: r.location || "Монгол",
+        };
+      });
+
+      setList(resorts);
+      setError(null);
+    } catch (err) {
+      console.error("Fetch error:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
     }
-
-    const data = await res.json();
-    console.log(data);
-
-   const resorts = (data.resorts || data).map((r) => {
-  const imgs = r.images || [];
-
-  let imgSrc = imgs.length > 0 ? imgs[0] : "";
-
-  const fullImg = imgSrc
-    ? /^https?:\/\//i.test(imgSrc)
-      ? imgSrc
-      : `${API_BASE}/${imgSrc.replace(/^\/+/, "")}`
-    : "https://via.placeholder.com/600x400?text=No+Image";
-
-  return {
-    ...r,
-    image: fullImg,
-    rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
-    visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
-    location: r.location || "Монгол",
-  };
-});
-
-    setList(resorts);
-    setError(null);
-  } catch (err) {
-    console.error("Fetch error:", err);
-    setError(err.message);
-  } finally {
-    setLoading(false);
   }
-}
   useEffect(() => {
     fetchResorts();
   }, []);
@@ -155,13 +155,13 @@ async function fetchResorts() {
 
                 {/* Зураг */}
                 <div className="relative overflow-hidden h-56">
-<img
-  src={resort.image}
-  alt={resort.name}
-  className="w-full h-60 object-cover"
-/>
+                  <img
+                    src={resort.image}
+                    alt={resort.name}
+                    className="w-full h-60 object-cover"
+                  />
 
-                  
+
                   {/* Like Button */}
                   <button
                     onClick={(e) => toggleFavorite(resort._id, e)}
@@ -170,11 +170,10 @@ async function fetchResorts() {
                     <Heart
 
 
-                      className={`w-6 h-6 transition-colors duration-300 ${
-                        favorites.has(resort._id)
+                      className={`w-6 h-6 transition-colors duration-300 ${favorites.has(resort._id)
                           ? 'fill-red-500 text-red-500'
                           : 'text-gray-600'
-                      }`}
+                        }`}
 
                     />
                   </button>
@@ -265,7 +264,7 @@ async function fetchResorts() {
             <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse"></div>
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
           </div>
-          
+
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Таны амралтын газар энд байна уу?
@@ -304,28 +303,10 @@ async function fetchResorts() {
                 <span className="text-2xl font-bold text-white">AmraltinGazar</span>
               </div>
               <p className="text-gray-400 leading-relaxed">
-                Монголын хамгийн том амралтын газрын мэдээллийн платформ
+                Монголын амралтын газрын мэдээллийн платформ
               </p>
             </div>
-            
-            <div>
-              <h3 className="text-white font-bold text-lg mb-4">Холбоосууд</h3>
-              <ul className="space-y-3">
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Бидний тухай</a></li>
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Амралтын газрууд</a></li>
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Блог</a></li>
-              </ul>
-            </div>
-            
-            <div>
-              <h3 className="text-white font-bold text-lg mb-4">Тусламж</h3>
-              <ul className="space-y-3">
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Түгээмэл асуулт</a></li>
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Нөхцөл</a></li>
-                <li><a href="#" className="hover:text-teal-400 transition-colors">Нууцлал</a></li>
-              </ul>
-            </div>
-            
+
             <div>
               <h3 className="text-white font-bold text-lg mb-4">Холбогдох</h3>
               <ul className="space-y-3">
@@ -333,7 +314,7 @@ async function fetchResorts() {
                   <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                   </svg>
-                  <span>+976 9999-9999</span>
+                  <span>+976 91354449</span>
                 </li>
                 <li className="flex items-center gap-3">
                   <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -344,7 +325,7 @@ async function fetchResorts() {
               </ul>
             </div>
           </div>
-          
+
           <div className="border-t border-gray-800 pt-8 text-center text-gray-500">
             <p>© 2026 AmraltinGazar. Бүх эрх хуулиар хамгаалагдсан.</p>
           </div>
