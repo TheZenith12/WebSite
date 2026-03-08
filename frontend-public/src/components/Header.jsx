@@ -13,8 +13,8 @@ function Header({ totalVisitors = 0, totalResorts = 0 }) {
             </div>
             <h1 className="text-3xl font-bold tracking-tight">AmraltinGazar</h1>
           </div>
-          
-          {/* Stats */}
+
+          {/* Stats - Desktop */}
           <div className="hidden md:flex gap-4 items-center">
             <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-5 py-3 rounded-full hover:bg-white/30 transition-all duration-300 cursor-pointer">
               <Users className="w-5 h-5" />
@@ -32,7 +32,7 @@ function Header({ totalVisitors = 0, totalResorts = 0 }) {
             </div>
           </div>
 
-          {/* Mobile Stats */}
+          {/* Stats - Mobile */}
           <div className="flex md:hidden gap-3 text-sm">
             <div className="bg-white/20 backdrop-blur-sm px-3 py-2 rounded-full">
               <span className="font-bold">{totalResorts}</span> газар

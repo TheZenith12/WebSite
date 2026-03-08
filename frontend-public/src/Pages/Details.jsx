@@ -38,7 +38,10 @@ export default function Details() {
             : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
         );
         setImages(fullImgs);
-        setCurrentImg(fullImgs[0] || "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80");
+        setCurrentImg(
+          fullImgs[0] ||
+            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80"
+        );
 
         const vids = data.files?.videos || [];
         const fullVids = vids.map((src) =>
@@ -142,7 +145,6 @@ export default function Details() {
     }
   };
 
-  // Loading
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
@@ -160,8 +162,8 @@ export default function Details() {
         <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
           <div className="text-6xl mb-4">😕</div>
           <h2 className="text-2xl font-bold mb-4">Амралтын газар олдсонгүй</h2>
-          <Link 
-            to="/" 
+          <Link
+            to="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-xl font-semibold hover:shadow-lg transition-all"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -182,7 +184,7 @@ export default function Details() {
           alt={resort.name}
           className="w-full h-full object-cover"
         />
-        
+
         {/* Back Button */}
         <Link
           to="/"
@@ -199,7 +201,7 @@ export default function Details() {
         >
           <Heart
             className={`w-7 h-7 transition-colors ${
-              isLiked ? 'fill-red-500 text-red-500' : 'text-gray-600'
+              isLiked ? "fill-red-500 text-red-500" : "text-gray-600"
             }`}
           />
         </button>
@@ -207,7 +209,7 @@ export default function Details() {
         {/* Title Overlay */}
         <div className="absolute bottom-8 left-8 z-20 text-white max-w-2xl">
           <h1 className="text-5xl font-bold mb-4 drop-shadow-lg">{resort.name}</h1>
-          <div className="flex items-center gap-6 text-lg">
+          <div className="flex items-center gap-6 text-lg flex-wrap">
             <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
               <MapPin className="w-5 h-5" />
               <span>{resort.location || "Монгол"}</span>
@@ -227,7 +229,7 @@ export default function Details() {
       {/* Main Content */}
       <div className="container mx-auto px-6 -mt-20 relative z-30">
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-12">
-          
+
           {/* Info Section */}
           <div className="grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
@@ -249,9 +251,9 @@ export default function Details() {
                     src={src}
                     alt={`${resort.name} ${i + 1}`}
                     className={`w-full h-48 object-cover rounded-xl shadow cursor-pointer transition-all duration-300 ${
-                      currentImg === src 
-                        ? 'ring-4 ring-teal-500 scale-105' 
-                        : 'hover:scale-105 hover:shadow-xl'
+                      currentImg === src
+                        ? "ring-4 ring-teal-500 scale-105"
+                        : "hover:scale-105 hover:shadow-xl"
                     }`}
                     onClick={() => setCurrentImg(src)}
                   />
@@ -288,10 +290,7 @@ export default function Details() {
               <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
                 🗺 Байршил
               </h3>
-              <div
-                ref={mapRef}
-                className="w-full h-80 rounded-2xl shadow-xl"
-              />
+              <div ref={mapRef} className="w-full h-80 rounded-2xl shadow-xl" />
             </div>
           </div>
 
@@ -300,7 +299,10 @@ export default function Details() {
             <h2 className="text-3xl font-bold mb-8 text-gray-900">Сэтгэгдлүүд</h2>
 
             {/* Add Review Form */}
-            <form onSubmit={handleSubmit} className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-8 mb-8 shadow-lg">
+            <form
+              onSubmit={handleSubmit}
+              className="bg-gradient-to-br from-teal-50 to-emerald-50 rounded-2xl p-8 mb-8 shadow-lg"
+            >
               <h3 className="text-xl font-bold mb-6 text-gray-900">Сэтгэгдэл үлдээх</h3>
               <div className="space-y-4">
                 <input
@@ -326,10 +328,12 @@ export default function Details() {
                     onChange={(e) => setRating(Number(e.target.value))}
                   >
                     {[1, 2, 3, 4, 5].map((n) => (
-                      <option key={n} value={n}>{"⭐".repeat(n)} {n} од</option>
+                      <option key={n} value={n}>
+                        {"⭐".repeat(n)} {n} од
+                      </option>
                     ))}
                   </select>
-                  <button 
+                  <button
                     type="submit"
                     className="flex-1 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl"
                   >
@@ -345,11 +349,16 @@ export default function Details() {
               {reviews.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 rounded-2xl">
                   <div className="text-6xl mb-4">💬</div>
-                  <p className="text-gray-500 text-lg">Сэтгэгдэл байхгүй байна. Эхний сэтгэгдлээ үлдээгээрэй!</p>
+                  <p className="text-gray-500 text-lg">
+                    Сэтгэгдэл байхгүй байна. Эхний сэтгэгдлээ үлдээгээрэй!
+                  </p>
                 </div>
               ) : (
                 reviews.map((r) => (
-                  <div key={r._id} className="bg-gray-50 rounded-2xl p-6 hover:shadow-lg transition-shadow">
+                  <div
+                    key={r._id}
+                    className="bg-gray-50 rounded-2xl p-6 hover:shadow-lg transition-shadow"
+                  >
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h4 className="font-bold text-lg text-gray-900">{r.userName}</h4>
@@ -360,14 +369,14 @@ export default function Details() {
                                 key={i}
                                 className={`w-4 h-4 ${
                                   i < r.rating
-                                    ? 'fill-yellow-400 text-yellow-400'
-                                    : 'fill-gray-200 text-gray-200'
+                                    ? "fill-yellow-400 text-yellow-400"
+                                    : "fill-gray-200 text-gray-200"
                                 }`}
                               />
                             ))}
                           </div>
                           <span className="text-sm text-gray-500">
-                            {new Date(r.createdAt).toLocaleDateString('mn-MN')}
+                            {new Date(r.createdAt).toLocaleDateString("mn-MN")}
                           </span>
                         </div>
                       </div>
@@ -380,8 +389,7 @@ export default function Details() {
           </div>
         </div>
       </div>
-
-      {/* Footer Spacer */}
+      
       <div className="h-20" />
     </div>
   );

@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Search, Eye, MapPin, Star, Heart, ChevronRight } from "lucide-react";
+import { Eye, MapPin, Star, Heart, ChevronRight } from "lucide-react";
 import Header from "./Header";
 import Hero from "./Hero";
 
@@ -12,17 +12,16 @@ function Resorts() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
+  const [visibleCount, setVisibleCount] = useState(6);
+  const loaderRef = useRef(null);
+  const PAGE_SIZE = 4;
 
-  // 🏕️ Fetch resorts from backend
   // 🏕️ Fetch resorts from backend
   async function fetchResorts() {
     setLoading(true);
-
     try {
       const res = await fetch(`${API_BASE}/api/admin/resorts`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
       if (!res.ok) {
@@ -30,13 +29,10 @@ function Resorts() {
       }
 
       const data = await res.json();
-      console.log(data);
 
       const resorts = (data.resorts || data).map((r) => {
         const imgs = r.images || [];
-
-        let imgSrc = imgs.length > 0 ? imgs[0] : "";
-
+        const imgSrc = imgs.length > 0 ? imgs[0] : "";
         const fullImg = imgSrc
           ? /^https?:\/\//i.test(imgSrc)
             ? imgSrc
@@ -61,6 +57,7 @@ function Resorts() {
       setLoading(false);
     }
   }
+
   useEffect(() => {
     fetchResorts();
   }, []);
@@ -95,6 +92,28 @@ function Resorts() {
   const totalVisitors = useMemo(() => {
     return list.reduce((sum, resort) => sum + (resort.visitors || 0), 0);
   }, [list]);
+
+  // Visible items for infinite scroll
+  const visibleItems = useMemo(() => filteredList.slice(0, visibleCount), [filteredList, visibleCount]);
+  const hasMore = visibleCount < filteredList.length;
+
+  // Intersection Observer for infinite scroll
+  const handleObserver = useCallback((entries) => {
+    if (entries[0].isIntersecting && hasMore) {
+      setVisibleCount((prev) => prev + PAGE_SIZE);
+    }
+  }, [hasMore]);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(handleObserver, { threshold: 0.1 });
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => observer.disconnect();
+  }, [handleObserver]);
+
+  // Reset visible count on search
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [searchTerm]);
 
   // 🌀 Loading state
   if (loading) {
@@ -133,99 +152,88 @@ function Resorts() {
       <Header totalResorts={list.length} totalVisitors={totalVisitors} />
 
       {/* Hero Section */}
-      <Hero searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      <Hero searchTerm={searchTerm} setSearchTerm={setSearchTerm} list={list} totalVisitors={totalVisitors} />
 
       {/* Resorts Grid */}
       <section className="container mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">
-            Онцлох амралтын газрууд
-          </h2>
+          <h2 className="text-3xl font-bold text-gray-900">Онцлох амралтын газрууд</h2>
           <span className="text-gray-500 font-medium">{filteredList.length} газар олдлоо</span>
         </div>
 
         {filteredList.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-            {filteredList.map((resort) => (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {visibleItems.map((resort) => (
               <article
                 key={resort._id}
                 className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-                onClick={() => setSelectedResort(resort)}
               >
-
-                {/* Зураг */}
-                <div className="relative overflow-hidden h-56">
+                {/* Image */}
+                <div className="relative overflow-hidden h-36 sm:h-48">
                   <img
                     src={resort.image}
                     alt={resort.name}
-                    className="w-full h-60 object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-
 
                   {/* Like Button */}
                   <button
                     onClick={(e) => toggleFavorite(resort._id, e)}
-                    className="absolute top-4 right-4 w-12 h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300"
+                    className="absolute top-2 right-2 w-8 h-8 sm:w-12 sm:h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300"
                   >
                     <Heart
-
-
-                      className={`w-6 h-6 transition-colors duration-300 ${favorites.has(resort._id)
-                          ? 'fill-red-500 text-red-500'
-                          : 'text-gray-600'
-                        }`}
-
+                      className={`w-4 h-4 sm:w-6 sm:h-6 transition-colors duration-300 ${
+                        favorites.has(resort._id)
+                          ? "fill-red-500 text-red-500"
+                          : "text-gray-600"
+                      }`}
                     />
                   </button>
 
                   {/* Category Badge */}
-                  <div className="absolute top-4 left-4 px-4 py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-full text-sm font-semibold shadow-lg">
+                  <div className="absolute top-2 left-2 px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg">
                     Жуулчны бааз
                   </div>
 
                   {/* Views Counter */}
-                  <div className="absolute bottom-4 left-4 px-3 py-1.5 bg-black/50 backdrop-blur-sm text-white rounded-full text-sm flex items-center gap-2">
-                    <Eye className="w-4 h-4" />
-                    {resort.visitors?.toLocaleString() || '2.5k'}
+                  <div className="absolute bottom-2 left-2 px-2 py-1 sm:px-3 sm:py-1.5 bg-black/50 backdrop-blur-sm text-white rounded-full text-xs flex items-center gap-1">
+                    <Eye className="w-3 h-3" />
+                    {resort.visitors?.toLocaleString() || "2.5k"}
                   </div>
                 </div>
 
                 {/* Content */}
-                <div className="p-6">
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-teal-600 transition-colors">
-                        {resort.name}
-                      </h3>
-                      <div className="flex items-center gap-1.5 text-gray-600 text-sm">
-                        <MapPin className="w-4 h-4 text-teal-500" />
-                        {resort.location}
-                      </div>
+                <div className="p-3 sm:p-6">
+                  <div className="mb-2 sm:mb-3">
+                    <h3 className="text-base sm:text-xl font-bold text-gray-900 mb-0.5 sm:mb-1 group-hover:text-teal-600 transition-colors leading-tight">
+                      {resort.name}
+                    </h3>
+                    <div className="flex items-center gap-1 text-gray-600 text-xs sm:text-sm">
+                      <MapPin className="w-3 h-3 sm:w-4 sm:h-4 text-teal-500 flex-shrink-0" />
+                      <span className="truncate">{resort.location}</span>
                     </div>
                   </div>
 
                   {/* Rating */}
-                  <div className="flex items-center gap-2 mb-4">
-                    <div className="flex items-center gap-1 px-3 py-1.5 bg-gradient-to-r from-amber-400 to-orange-400 rounded-lg">
-                      <Star className="w-4 h-4 fill-white text-white" />
-                      <span className="text-white font-semibold text-sm">{resort.rating}</span>
+                  <div className="flex items-center gap-1.5 mb-2 sm:mb-4">
+                    <div className="flex items-center gap-0.5 px-2 py-1 bg-gradient-to-r from-amber-400 to-orange-400 rounded-lg">
+                      <Star className="w-3 h-3 fill-white text-white" />
+                      <span className="text-white font-semibold text-xs">{resort.rating}</span>
                     </div>
-                    <span className="text-gray-500 text-sm">({resort.visitors || 2068} үнэлгээ)</span>
+                    <span className="text-gray-500 text-xs hidden sm:inline">({resort.visitors || 2068} үнэлгээ)</span>
                   </div>
 
                   {/* Price */}
-                  <div className="flex items-end justify-between mb-4 pb-4 border-b border-gray-100">
-                    <div>
-                      <span className="text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
-                        {resort.price ? `${parseInt(resort.price).toLocaleString()}₮` : "—"}
-                      </span>
-                      <span className="text-gray-500 text-sm ml-2">/ хоног</span>
-                    </div>
+                  <div className="mb-2 sm:mb-4 pb-2 sm:pb-4 border-b border-gray-100">
+                    <span className="text-lg sm:text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
+                      {resort.price ? `${parseInt(resort.price).toLocaleString()}₮` : "—"}
+                    </span>
+                    <span className="text-gray-500 text-xs ml-1">/ хоног</span>
                   </div>
 
-                  {/* Amenities */}
-                  <div className="flex flex-wrap gap-2 mb-4">
+                  {/* Amenities - hide on mobile */}
+                  <div className="hidden sm:flex flex-wrap gap-2 mb-4">
                     <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">
                       Халуун рашаан
                     </span>
@@ -240,15 +248,29 @@ function Resorts() {
                   {/* CTA Button */}
                   <Link
                     to={`/details/${resort._id}`}
-                    className="w-full py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-lg hover:shadow-xl group"
+                    className="w-full py-2 sm:py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl text-xs sm:text-base font-semibold flex items-center justify-center gap-1 sm:gap-2 transition-all duration-300 shadow-lg hover:shadow-xl group/btn"
                   >
-                    Дэлгэрэнгүй үзэх
-                    <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    <span className="hidden sm:inline">Дэлгэрэнгүй үзэх</span>
+                    <span className="sm:hidden">Үзэх</span>
+                    <ChevronRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
                   </Link>
                 </div>
               </article>
-            ))}
-          </div>
+              ))}
+            </div>
+
+            {/* Infinite scroll sentinel */}
+            <div ref={loaderRef} className="flex justify-center py-10">
+              {hasMore ? (
+                <div className="flex items-center gap-3 text-teal-600">
+                  <div className="w-6 h-6 border-3 border-teal-500 border-t-transparent rounded-full animate-spin" style={{ borderWidth: "3px" }} />
+                  <span className="font-medium text-gray-500">Ачаалж байна...</span>
+                </div>
+              ) : (
+                <p className="text-gray-400 font-medium">Бүх амралт харагдаж байна ({filteredList.length})</p>
+              )}
+            </div>
+          </>
         ) : (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">😕</div>
@@ -260,11 +282,10 @@ function Resorts() {
       {/* CTA Section */}
       <section className="container mx-auto px-6 py-16">
         <div className="relative overflow-hidden bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 rounded-3xl p-12 text-center text-white shadow-2xl">
-          <div className="absolute inset-0 opacity-20">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse"></div>
-            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           </div>
-
           <div className="relative z-10">
             <h2 className="text-4xl md:text-5xl font-bold mb-6">
               Таны амралтын газар энд байна уу?
@@ -272,21 +293,9 @@ function Resorts() {
             <p className="text-xl text-teal-50 mb-8 max-w-2xl mx-auto">
               Өөрийн амралтын газрыг бүртгүүлж, мянга мянган хүмүүст таниулаарай
             </p>
-
-
-            <button
-              onClick={() => navigate("/admin/add-resort")}
-              className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105"
-            >
+            <button className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:scale-105">
               Амралтын газар нэмэх
             </button>
-
-
-
-            <button className="px-10 py-5 bg-white text-teal-600 hover:bg-gray-50 rounded-2xl font-bold text-lg transition-all duration-300 shadow-2xl hover:shadow-3xl hover:scale-105">
-              Амралтын газар нэмэх
-            </button>
-
           </div>
         </div>
       </section>
