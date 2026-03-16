@@ -11,7 +11,7 @@ function Header({ totalVisitors = 0, totalResorts = 0 }) {
             <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center hover:scale-110 transition-transform duration-300">
               <span className="text-3xl">🌿</span>
             </div>
-            <h1 className="text-3xl font-bold tracking-tight">AmraltinGazar</h1>
+            <h1 className="text-3xl font-bold tracking-tight">Амралтын газрууд</h1>
           </div>
 
           {/* Stats - Desktop */}
