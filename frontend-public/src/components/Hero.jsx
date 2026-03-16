@@ -45,7 +45,7 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
             Тавтай морилно уу!
           </h2>
           <p className="text-base md:text-2xl text-teal-100 mb-8 md:mb-12 drop-shadow">
-            Байгаль, тайван амралт, тохилог байр танай хүлээж байна
+            Байгаль, тайван амралт, тохилог байр таныг хүлээж байна
           </p>
 
           {/* Search Bar */}

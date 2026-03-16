@@ -336,7 +336,7 @@ function Resorts() {
           </div>
 
           <div className="border-t border-gray-800 pt-8 text-center text-gray-500">
-            <p>© 2026 AmraltinGazar. Бүх эрх хуулиар хамгаалагдсан.</p>
+            <p>© 2026 AmraltinGazar</p>
           </div>
         </div>
       </footer>
