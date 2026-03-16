@@ -18,10 +18,7 @@ function AnimatedCounter({ value, duration = 1500, suffix = "" }) {
 
 function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
   const [isFocused, setIsFocused] = useState(false);
-  const heroImage =
-    list && list.length > 0
-      ? list[0].images?.[0] || list[0].image
-      : "13.png";
+  const heroImage = "13.png";
 
   return (
     <section
