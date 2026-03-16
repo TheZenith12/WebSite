@@ -230,16 +230,17 @@ export default function Details() {
       <div className="container mx-auto px-6 -mt-20 relative z-30">
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-12">
 
-          {/* Info Section */}
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="md:col-span-2">
-              <h2 className="text-3xl font-bold mb-4 text-gray-900">Тайлбар</h2>
-              <p className="text-gray-700 text-lg leading-relaxed">
-                {resort.description || "Тайлбар байхгүй байна."}
-              </p>
-            </div>
-          </div>
 
+<div className="grid md:grid-cols-3 gap-8">
+  <div className="md:col-span-2">
+    <h2 className="text-3xl font-bold mb-4 text-gray-900">
+      Тайлбар
+    </h2>
+    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+      {resort.description || "Тайлбар байхгүй байна."}
+    </p>
+  </div>
+</div>
           {/* Image Gallery */}
           {images.length > 0 && (
             <div>
