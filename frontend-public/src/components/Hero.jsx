@@ -128,9 +128,9 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
             {/* Mobile: хэвтээ дараалал */}
             <div className="flex md:hidden gap-3 overflow-x-auto pb-2 scrollbar-hide px-1 justify-center">
               {[
-                { value: 4, suffix: "+", label: "Амралтын газар", from: "from-teal-500", to: "to-emerald-600" },
+                { value: 2, suffix: "+", label: "Амралтын газар", from: "from-teal-500", to: "to-emerald-600" },
                 { value: 1370, suffix: "k+", label: "Жуулчид", from: "from-blue-500", to: "to-indigo-600" },
-                { value: 48, suffix: "★", label: "Дундаж үнэлгээ", from: "from-purple-500", to: "to-pink-600" },
+                { value: 4.8, suffix: "★", label: "Дундаж үнэлгээ", from: "from-purple-500", to: "to-pink-600" },
               ].map((stat, i) => (
                 <div key={i} className={`flex-shrink-0 bg-gradient-to-br ${stat.from} ${stat.to} rounded-2xl px-5 py-4 text-white shadow-lg`}>
                   <div className="text-2xl font-bold">
