@@ -179,7 +179,7 @@ setExistingVideos(files?.videos || []);
         {/* TEXT FIELDS */}
         <input type="text" name="name" value={form.name} onChange={handleChange} className="border w-full p-2 rounded" />
         <textarea name="description" value={form.description} onChange={handleChange} className="border w-full p-2 rounded" />
-        <input type="number" name="phone" value={form.price} onChange={handleChange} className="border w-full p-2 rounded" />
+        <input type="text" name="phone" value={form.phone} onChange={handleChange} className="border w-full p-2 rounded" />
         <input type="number" name="price" value={form.price} onChange={handleChange} className="border w-full p-2 rounded" />
         <input type="text" name="location" value={form.location} onChange={handleChange} className="border w-full p-2 rounded" />
         <input type="text" name="lng" value={form.lng} onChange={handleChange} className="border w-full p-2 rounded" />
