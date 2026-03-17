@@ -40,7 +40,7 @@ export default function Details() {
         setImages(fullImgs);
         setCurrentImg(
           fullImgs[0] ||
-            "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80"
+          "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80"
         );
 
         const vids = data.files?.videos || [];
@@ -200,9 +200,8 @@ export default function Details() {
           className="absolute top-6 right-6 z-20 w-14 h-14 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
         >
           <Heart
-            className={`w-7 h-7 transition-colors ${
-              isLiked ? "fill-red-500 text-red-500" : "text-gray-600"
-            }`}
+            className={`w-7 h-7 transition-colors ${isLiked ? "fill-red-500 text-red-500" : "text-gray-600"
+              }`}
           />
         </button>
 
@@ -226,21 +225,7 @@ export default function Details() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-6 -mt-20 relative z-30">
-        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-12">
-
-
-<div className="grid md:grid-cols-3 gap-8">
-  <div className="md:col-span-2">
-    <h2 className="text-3xl font-bold mb-4 text-gray-900">
-      Тайлбар
-    </h2>
-    <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
-      {resort.description || "Тайлбар байхгүй байна."}
-    </p>
-  </div>
-</div>
+      
           {/* Image Gallery */}
           {images.length > 0 && (
             <div>
@@ -251,18 +236,29 @@ export default function Details() {
                     key={i}
                     src={src}
                     alt={`${resort.name} ${i + 1}`}
-                    className={`w-full h-48 object-cover rounded-xl shadow cursor-pointer transition-all duration-300 ${
-                      currentImg === src
+                    className={`w-full h-48 object-cover rounded-xl shadow cursor-pointer transition-all duration-300 ${currentImg === src
                         ? "ring-4 ring-teal-500 scale-105"
                         : "hover:scale-105 hover:shadow-xl"
-                    }`}
+                      }`}
                     onClick={() => setCurrentImg(src)}
                   />
                 ))}
               </div>
             </div>
           )}
-
+{/* Main Content */}
+      <div className="container mx-auto px-6 relative z-30">
+        <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-12">
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-2">
+              <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                Тайлбар
+              </h2>
+              <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                {resort.description || "Тайлбар байхгүй байна."}
+              </p>
+            </div>
+          </div>
           {/* Video & Map */}
           <div className="grid md:grid-cols-2 gap-8">
             {/* Video */}
@@ -368,11 +364,10 @@ export default function Details() {
                             {[...Array(5)].map((_, i) => (
                               <Star
                                 key={i}
-                                className={`w-4 h-4 ${
-                                  i < r.rating
+                                className={`w-4 h-4 ${i < r.rating
                                     ? "fill-yellow-400 text-yellow-400"
                                     : "fill-gray-200 text-gray-200"
-                                }`}
+                                  }`}
                               />
                             ))}
                           </div>
@@ -390,7 +385,7 @@ export default function Details() {
           </div>
         </div>
       </div>
-      
+
       <div className="h-20" />
     </div>
   );
