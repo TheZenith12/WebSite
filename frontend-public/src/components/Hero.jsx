@@ -144,16 +144,16 @@ function Hero({ searchTerm, setSearchTerm, list = [], totalVisitors = 0 }) {
             {/* Desktop: 3 багана */}
             <div className="hidden md:grid grid-cols-3 gap-6 max-w-5xl mx-auto">
               <div className="bg-gradient-to-br from-teal-500 to-emerald-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                <div className="text-5xl font-bold mb-2"><AnimatedCounter value={4} suffix="+" /></div>
+                <div className="text-5xl font-bold mb-2"><AnimatedCounter value={7} suffix="+" /></div>
                 <div className="text-teal-50 text-lg">Амралтын газар</div>
               </div>
               <div className="bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                <div className="text-5xl font-bold mb-2"><AnimatedCounter value={1370} suffix="k+" /></div>
-                <div className="text-blue-50 text-lg">Жуулчид</div>
+                <div className="text-5xl font-bold mb-2"><AnimatedCounter value={7} suffix="+" /></div>
+                <div className="text-blue-50 text-lg">Жуулчны бааз</div>
               </div>
               <div className="bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl p-8 text-white shadow-xl hover:scale-105 transition-all">
-                <div className="text-5xl font-bold mb-2"><AnimatedCounter value={48} suffix="★" /></div>
-                <div className="text-purple-50 text-lg">Дундаж үнэлгээ</div>
+                <div className="text-5xl font-bold mb-2"><AnimatedCounter value={7} suffix="★" /></div>
+                <div className="text-purple-50 text-lg">Байгалийн үзэсгэлэнт газар</div>
               </div>
             </div>
           </div>

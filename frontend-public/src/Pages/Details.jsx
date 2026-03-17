@@ -13,6 +13,7 @@ export default function Details() {
   const [videos, setVideos] = useState([]);
   const [currentImg, setCurrentImg] = useState("");
   const [loading, setLoading] = useState(true);
+  
 
   const [reviews, setReviews] = useState([]);
   const [userName, setUserName] = useState("");
@@ -160,7 +161,6 @@ export default function Details() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
         <div className="bg-white p-8 rounded-2xl shadow-xl text-center">
-          <div className="text-6xl mb-4">😕</div>
           <h2 className="text-2xl font-bold mb-4">Амралтын газар олдсонгүй</h2>
           <Link
             to="/"
@@ -225,28 +225,31 @@ export default function Details() {
         </div>
       </div>
 
-      
-          {/* Image Gallery */}
-          {images.length > 0 && (
-            <div>
-              <h3 className="text-2xl font-bold mb-6 text-gray-900">Зургийн галерей</h3>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {images.map((src, i) => (
-                  <img
-                    key={i}
-                    src={src}
-                    alt={`${resort.name} ${i + 1}`}
-                    className={`w-full h-48 object-cover rounded-xl shadow cursor-pointer transition-all duration-300 ${currentImg === src
-                        ? "ring-4 ring-teal-500 scale-105"
-                        : "hover:scale-105 hover:shadow-xl"
-                      }`}
-                    onClick={() => setCurrentImg(src)}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
-{/* Main Content */}
+
+      {/* Image Gallery */}
+      {images.length > 0 && (
+        <div>
+          <h3 className="text-2xl font-bold mb-6 text-gray-900">
+            Зургийн галерей
+          </h3>
+
+          <div className="flex gap-4 overflow-x-auto scroll-smooth pb-2">
+            {images.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt={`${resort.name} ${i + 1}`}
+                className={`min-w-[200px] h-48 object-cover rounded-xl shadow cursor-pointer transition-all duration-300 ${currentImg === src
+                    ? "ring-4 ring-teal-500 scale-105"
+                    : "hover:scale-105 hover:shadow-xl"
+                  }`}
+                onClick={() => setCurrentImg(src)}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+      {/* Main Content */}
       <div className="container mx-auto px-6 relative z-30">
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-12">
           <div className="grid md:grid-cols-3 gap-8">
@@ -365,8 +368,8 @@ export default function Details() {
                               <Star
                                 key={i}
                                 className={`w-4 h-4 ${i < r.rating
-                                    ? "fill-yellow-400 text-yellow-400"
-                                    : "fill-gray-200 text-gray-200"
+                                  ? "fill-yellow-400 text-yellow-400"
+                                  : "fill-gray-200 text-gray-200"
                                   }`}
                               />
                             ))}

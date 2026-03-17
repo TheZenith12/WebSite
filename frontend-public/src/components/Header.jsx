@@ -3,7 +3,7 @@ import { Users, MapPin } from "lucide-react";
 
 function Header({ totalVisitors = 0, totalResorts = 0 }) {
   return (
-    <header className="bg-gradient-to-r from-teal-600 via-emerald-600 to-teal-700 text-white shadow-2xl sticky top-0 z-50 w-full">
+<header className="bg-gradient-to-r from-teal-600 via-blue-700 to-blue-500 text-white shadow-2xl sticky top-0 z-50 w-full">
       <div className="w-full px-6 py-3 max-w-[1400px] mx-auto">
         <div className="flex justify-between items-center">
           {/* Logo */}
