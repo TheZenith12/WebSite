@@ -97,6 +97,12 @@ useEffect(() => {
                   {r.description || "No description"}
                 </div>
                 <div className="text-gray-800 text-sm">
+                  phone:{" "}
+                  <span className="font-semibold">
+                    {r.phone ? `${r.phone} ` : "********"}
+                  </span>
+                </div>
+                <div className="text-gray-800 text-sm">
                   💰 Үнэ:{" "}
                   <span className="font-semibold">
                     {r.price ? `${r.price} ₮` : "—"}
@@ -124,6 +130,7 @@ useEffect(() => {
             </div>
           </div>
         ))}
+        
 
         {!loading && list.length === 0 && (
           <div className="text-gray-500">No resorts found.</div>

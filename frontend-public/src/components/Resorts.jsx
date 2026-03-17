@@ -191,7 +191,7 @@ function Resorts() {
 
                     {/* Category Badge */}
                     <div className="absolute top-2 left-2 px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg">
-                      Жуулчны бааз
+                      Сувилал
                     </div>
 
                     {/* Views Counter */}

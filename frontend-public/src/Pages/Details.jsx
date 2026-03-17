@@ -13,7 +13,7 @@ export default function Details() {
   const [videos, setVideos] = useState([]);
   const [currentImg, setCurrentImg] = useState("");
   const [loading, setLoading] = useState(true);
-  
+
 
   const [reviews, setReviews] = useState([]);
   const [userName, setUserName] = useState("");
@@ -240,8 +240,8 @@ export default function Details() {
                 src={src}
                 alt={`${resort.name} ${i + 1}`}
                 className={`min-w-[200px] h-48 object-cover rounded-xl shadow cursor-pointer transition-all duration-300 ${currentImg === src
-                    ? "ring-4 ring-teal-500 scale-105"
-                    : "hover:scale-105 hover:shadow-xl"
+                  ? "ring-4 ring-teal-500 scale-105"
+                  : "hover:scale-105 hover:shadow-xl"
                   }`}
                 onClick={() => setCurrentImg(src)}
               />
@@ -288,7 +288,7 @@ export default function Details() {
             {/* Map */}
             <div>
               <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                🗺 Байршил
+                 Байршил
               </h3>
               <div ref={mapRef} className="w-full h-80 rounded-2xl shadow-xl" />
             </div>
@@ -321,21 +321,26 @@ export default function Details() {
                   onChange={(e) => setComment(e.target.value)}
                   required
                 />
-                <div className="flex gap-4 items-center">
-                  <select
-                    className="px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-200 outline-none transition-all font-semibold"
-                    value={rating}
-                    onChange={(e) => setRating(Number(e.target.value))}
-                  >
-                    {[1, 2, 3, 4, 5].map((n) => (
-                      <option key={n} value={n}>
-                        {"⭐".repeat(n)} {n} од
-                      </option>
-                    ))}
-                  </select>
+                <div className="relative">
+                  {/* Select box */}
+                  <div className="flex justify-center sm:justify-start">
+                    <select
+                      className="px-5 py-4 border-2 border-gray-200 rounded-xl focus:border-teal-500 focus:ring-4 focus:ring-teal-200 outline-none transition-all font-semibold w-full sm:w-auto"
+                      value={rating}
+                      onChange={(e) => setRating(Number(e.target.value))}
+                    >
+                      {[1, 2, 3, 4, 5].map((n) => (
+                        <option key={n} value={n}>
+                          {"⭐".repeat(n)} {n} од
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Submit button */}
                   <button
                     type="submit"
-                    className="flex-1 py-4 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg hover:shadow-xl"
+                    className="w-full sm:w-auto flex items-center justify-center py-4 px-6 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white font-bold gap-2 transition-all shadow-xl rounded-xl"
                   >
                     <Send className="w-5 h-5" />
                     Илгээх

@@ -8,6 +8,7 @@ export default function AddResort() {
   const [form, setForm] = useState({
     name: "",
     description: "",
+    phone: "",
     location: "",
     lat: "",
     lng: "",
@@ -46,68 +47,69 @@ export default function AddResort() {
 
   // 📤 Submit
   // ... таны импортууд ба state ижил
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    // 1) Images — Promise.all ашиглана
-    const uploadedImageUrls = await Promise.all(
-      images.map(async (img) => {
-        const res = await uploadToCloudinary(img);
-        // uploadToCloudinary аливаа объект эсвэл string буцааж болно — тохируулна
-        if (typeof res === "string") return res;
-        // Cloudinary response-д нийтлэг нь res.secure_url
-        if (res?.secure_url) return res.secure_url;
-        if (res?.url) return res.url;
-        throw new Error("Cloudinary response-д URL олдсонгүй");
-      })
-    );
+    try {
+      // 1) Images — Promise.all ашиглана
+      const uploadedImageUrls = await Promise.all(
+        images.map(async (img) => {
+          const res = await uploadToCloudinary(img);
+          // uploadToCloudinary аливаа объект эсвэл string буцааж болно — тохируулна
+          if (typeof res === "string") return res;
+          // Cloudinary response-д нийтлэг нь res.secure_url
+          if (res?.secure_url) return res.secure_url;
+          if (res?.url) return res.url;
+          throw new Error("Cloudinary response-д URL олдсонгүй");
+        })
+      );
 
-    // 2) Videos
-    const uploadedVideoUrls = await Promise.all(
-      videos.map(async (vid) => {
-        const res = await uploadToCloudinary(vid);
-        if (typeof res === "string") return res;
-        if (res?.secure_url) return res.secure_url;
-        if (res?.url) return res.url;
-        throw new Error("Cloudinary response-д URL олдсонгүй");
-      })
-    );
+      // 2) Videos
+      const uploadedVideoUrls = await Promise.all(
+        videos.map(async (vid) => {
+          const res = await uploadToCloudinary(vid);
+          if (typeof res === "string") return res;
+          if (res?.secure_url) return res.secure_url;
+          if (res?.url) return res.url;
+          throw new Error("Cloudinary response-д URL олдсонгүй");
+        })
+      );
 
-    // 3) Боловсруулалт (lat,lng-ийг Number болгох)
-    const payload = {
-      ...form,
-      lat: form.lat ? parseFloat(form.lat) : undefined,
-      lng: form.lng ? parseFloat(form.lng) : undefined,
-      images: uploadedImageUrls,
-      videos: uploadedVideoUrls,
-    };
+      // 3) Боловсруулалт (lat,lng-ийг Number болгох)
+      const payload = {
+        ...form,
+        lat: form.lat ? parseFloat(form.lat) : undefined,
+        lng: form.lng ? parseFloat(form.lng) : undefined,
+        images: uploadedImageUrls,
+        videos: uploadedVideoUrls,
+      };
 
-    // Зарим API-үүд JSON string-аар хүлээдэг тул шаардлагатай бол stringify хийгээд явуулж болно.
-    await axios.post(`${API_BASE}/api/admin/resorts/new`, payload);
+      // Зарим API-үүд JSON string-аар хүлээдэг тул шаардлагатай бол stringify хийгээд явуулж болно.
+      await axios.post(`${API_BASE}/api/admin/resorts/new`, payload);
 
-    alert("Амжилттай нэмэгдлээ!");
+      alert("Амжилттай нэмэгдлээ!");
 
-    // Reset
-    setForm({
-      name: "",
-      description: "",
-      location: "",
-      lat: "",
-      lng: "",
-      price: "",
-    });
-    setImages([]);
-    setVideos([]);
-    setPreviewUrls([]);
-  } catch (err) {
-    console.error("Алдаа:", err?.response?.data ?? err);
-    alert("Амралтын газар нэмэхэд алдаа гарлаа! Консолыг шаллана уу.");
-  } finally {
-    setLoading(false);
-  }
-};
+      // Reset
+      setForm({
+        name: "",
+        description: "",
+        phone: "",
+        location: "",
+        lat: "",
+        lng: "",
+        price: "",
+      });
+      setImages([]);
+      setVideos([]);
+      setPreviewUrls([]);
+    } catch (err) {
+      console.error("Алдаа:", err?.response?.data ?? err);
+      alert("Амралтын газар нэмэхэд алдаа гарлаа! Консолыг шаллана уу.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -126,6 +128,13 @@ const handleSubmit = async (e) => {
         <textarea
           name="description"
           placeholder="Тайлбар"
+          value={form.description}
+          onChange={handleChange}
+          className="border w-full px-3 py-2 rounded"
+        />
+        <textarea
+          name="phone"
+          placeholder="********"
           value={form.description}
           onChange={handleChange}
           className="border w-full px-3 py-2 rounded"

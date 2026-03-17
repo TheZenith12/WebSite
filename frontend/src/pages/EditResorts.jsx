@@ -12,6 +12,7 @@ function EditResort() {
   const [form, setForm] = useState({
     name: "",
     description: "",
+    phone: "",
     price: "",
     location: "",
   });
@@ -46,6 +47,7 @@ const files = res.data.files; // ❗ array биш object
 setForm({
   name: resort.name || "",
   description: resort.description || "",
+  phone: resort.phone || "",
   price: resort.price || "",
   location: resort.location || "",
   lat: resort.lat || "",
@@ -177,6 +179,7 @@ setExistingVideos(files?.videos || []);
         {/* TEXT FIELDS */}
         <input type="text" name="name" value={form.name} onChange={handleChange} className="border w-full p-2 rounded" />
         <textarea name="description" value={form.description} onChange={handleChange} className="border w-full p-2 rounded" />
+        <input type="number" name="phone" value={form.price} onChange={handleChange} className="border w-full p-2 rounded" />
         <input type="number" name="price" value={form.price} onChange={handleChange} className="border w-full p-2 rounded" />
         <input type="text" name="location" value={form.location} onChange={handleChange} className="border w-full p-2 rounded" />
         <input type="text" name="lng" value={form.lng} onChange={handleChange} className="border w-full p-2 rounded" />
