@@ -12,25 +12,6 @@ import authRoutes from "./src/routes/auth.js";
 import resortRoutes from "./src/routes/resorts.js";
 import fileRoutes from "./src/routes/fileRoutes.js";
 
-<<<<<<< Updated upstream
-const app = express();
-=======
-
-const app = express();
-
-import { useEffect, useState } from "react";
-
-const [pageViews, setPageViews] = useState(0);
-
-useEffect(() => {
-  fetch("http://localhost:3000/api/stats")
-    .then(res => res.json())
-    .then(data => setPageViews(data.pageViews));
-}, []);
-
-dotenv.config();
->>>>>>> Stashed changes
-
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
