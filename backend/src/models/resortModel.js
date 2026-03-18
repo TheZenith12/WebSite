@@ -5,7 +5,6 @@ const resortSchema = new mongoose.Schema(
     name: { type: String, required: true },
     description: String,
     location: String,
-    phone: String,
 
     lat: {
       type: Number,
@@ -18,7 +17,7 @@ const resortSchema = new mongoose.Schema(
     },
 
     phone: {
-      type: number
+      type: Number
       
     },
 
