@@ -254,12 +254,27 @@ export default function Details() {
         <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 space-y-12">
           <div className="grid md:grid-cols-3 gap-8">
             <div className="md:col-span-2">
-              <h2 className="text-3xl font-bold mb-4 text-gray-900">
-                Тайлбар
-              </h2>
-              <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
-                {resort.description || "Тайлбар байхгүй байна."}
-              </p>
+
+              {/* Тайлбар */}
+              <div>
+                <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                  Тайлбар
+                </h2>
+                <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                  {resort.description || "Тайлбар байхгүй байна."}
+                </p>
+              </div>
+
+              {/* Утас */}
+              <div className="mt-6">
+                <h2 className="text-3xl font-bold mb-4 text-gray-900">
+                  Утас
+                </h2>
+                <p className="text-gray-700 text-lg leading-relaxed whitespace-pre-line">
+                  {resort.phone || "Утас байхгүй байна."}
+                </p>
+              </div>
+
             </div>
           </div>
           {/* Video & Map */}
@@ -288,7 +303,7 @@ export default function Details() {
             {/* Map */}
             <div>
               <h3 className="text-2xl font-bold mb-6 text-gray-900 flex items-center gap-2">
-                 Байршил
+                Байршил
               </h3>
               <div ref={mapRef} className="w-full h-80 rounded-2xl shadow-xl" />
             </div>

@@ -50,6 +50,7 @@ function Resorts() {
       });
       if (!res.ok) throw new Error("Failed to delete resort");
       setList(list.filter((r) => r._id !== id));
+      
     } catch (err) {
       alert(err.message);
     }

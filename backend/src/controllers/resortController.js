@@ -237,7 +237,7 @@ export const updateResort = async (req, res) => {
   }
 };
 
-// ✅ ЗАСАГДСАН deleteResort
+// ✅ deleteResort
 export const deleteResort = async (req, res) => {
   try {
     const { id } = req.params;
@@ -247,11 +247,11 @@ export const deleteResort = async (req, res) => {
       return res.status(404).json({ success: false, message: "Resort not found" });
     }
 
-    // ✅ find() → findOne() болгон засав
+    // findOne() 
     const files = await File.findOne({ resortId: id });
 
     if (files) {
-      // ✅ try/catch нэмсэн — Cloudinary алдаанаас болж delete зогсохгүй
+      // ✅ try/catch delete 
       for (const img of files.images || []) {
         try {
           await cloudinary.uploader.destroy(extractPublicId(img));
@@ -270,7 +270,7 @@ export const deleteResort = async (req, res) => {
         }
       }
 
-      // ✅ File document-ийг ч устгасан
+      // ✅устгасан
       await File.findByIdAndDelete(files._id);
     }
 
