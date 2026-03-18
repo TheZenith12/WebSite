@@ -14,6 +14,8 @@ export default function Details() {
   const [currentImg, setCurrentImg] = useState("");
   const [loading, setLoading] = useState(true);
 
+
+  const [reviews, setReviews] = useState([]);
   const [userName, setUserName] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
@@ -50,6 +52,7 @@ export default function Details() {
         );
         setVideos(fullVids);
 
+        fetchReviews();
       } catch (err) {
         console.error("Fetch resort error:", err);
       } finally {
@@ -115,6 +118,23 @@ export default function Details() {
     }
   }, [resort]);
 
+  // Submit Review
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API_BASE}/api/reviews/${id}`, {
+        userName,
+        rating,
+        comment,
+      });
+      setUserName("");
+      setComment("");
+      setRating(5);
+      fetchReviews();
+    } catch (err) {
+      console.error("Submit review error:", err);
+    }
+  };
 
   if (loading) {
     return (
