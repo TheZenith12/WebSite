@@ -1,14 +1,28 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Eye, MapPin, Star, Heart, ChevronRight } from "lucide-react";
+import { Eye, MapPin, Heart, ChevronRight } from "lucide-react";
 import Header from "./Header";
 import Hero from "./Hero";
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
+const CATEGORY_CONFIG = {
+  suvilal: { label: "Сувилал", gradient: "from-teal-500 to-emerald-500" },
+  juulchnii_baaz: { label: "Жуулчны бааз", gradient: "from-blue-500 to-indigo-500" },
+  uzseglent_gazar: { label: "Үзэсгэлэнт газар", gradient: "from-purple-500 to-pink-500" },
+};
+
+function getCategoryLabel(cat) {
+  return CATEGORY_CONFIG[cat]?.label || "Сувилал";
+}
+function getCategoryGradient(cat) {
+  return CATEGORY_CONFIG[cat]?.gradient || "from-teal-500 to-emerald-500";
+}
+
 function Resorts() {
   const [list, setList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [favorites, setFavorites] = useState(new Set());
@@ -16,18 +30,13 @@ function Resorts() {
   const loaderRef = useRef(null);
   const PAGE_SIZE = 4;
 
-  // 🏕️ Fetch resorts from backend
   async function fetchResorts() {
     setLoading(true);
     try {
       const res = await fetch(`${API_BASE}/api/admin/resorts`, {
         headers: { "Content-Type": "application/json" },
       });
-
-      if (!res.ok) {
-        throw new Error("Серверээс алдаа ирлээ: " + res.status);
-      }
-
+      if (!res.ok) throw new Error("Серверээс алдаа ирлээ: " + res.status);
       const data = await res.json();
 
       const resorts = (data.resorts || data).map((r) => {
@@ -42,9 +51,9 @@ function Resorts() {
         return {
           ...r,
           image: fullImg,
-          rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
           visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
           location: r.location || "Монгол",
+          category: r.category || "suvilal",
         };
       });
 
@@ -58,64 +67,57 @@ function Resorts() {
     }
   }
 
-  useEffect(() => {
-    fetchResorts();
-  }, []);
+  useEffect(() => { fetchResorts(); }, []);
 
-  // 🔍 Search filter
+  // Search + Category filter
   const filteredList = useMemo(() => {
+    let result = list;
+    if (activeCategory) {
+      result = result.filter((r) => r.category === activeCategory);
+    }
     const term = searchTerm.trim().toLowerCase();
-    if (!term) return list;
-    return list.filter(
-      (p) =>
-        p.name?.toLowerCase().includes(term) ||
-        p.price?.toString().includes(term) ||
-        p.description?.toLowerCase().includes(term) ||
-        p.location?.toLowerCase().includes(term)
-    );
-  }, [searchTerm, list]);
+    if (term) {
+      result = result.filter(
+        (p) =>
+          p.name?.toLowerCase().includes(term) ||
+          p.price?.toString().includes(term) ||
+          p.description?.toLowerCase().includes(term) ||
+          p.location?.toLowerCase().includes(term)
+      );
+    }
+    return result;
+  }, [searchTerm, activeCategory, list]);
 
-  // ♥ Toggle favorite
   const toggleFavorite = (id, e) => {
     e.preventDefault();
     e.stopPropagation();
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(id)) {
-      newFavorites.delete(id);
-    } else {
-      newFavorites.add(id);
-    }
-    setFavorites(newFavorites);
+    const next = new Set(favorites);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setFavorites(next);
   };
 
-  // Total visitors calculation
-  const totalVisitors = useMemo(() => {
-    return list.reduce((sum, resort) => sum + (resort.visitors || 0), 0);
-  }, [list]);
+  const totalVisitors = useMemo(() => list.reduce((s, r) => s + (r.visitors || 0), 0), [list]);
 
-  // Visible items for infinite scroll
   const visibleItems = useMemo(() => filteredList.slice(0, visibleCount), [filteredList, visibleCount]);
   const hasMore = visibleCount < filteredList.length;
 
-  // Intersection Observer for infinite scroll
   const handleObserver = useCallback((entries) => {
-    if (entries[0].isIntersecting && hasMore) {
-      setVisibleCount((prev) => prev + PAGE_SIZE);
-    }
+    if (entries[0].isIntersecting && hasMore) setVisibleCount((p) => p + PAGE_SIZE);
   }, [hasMore]);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(handleObserver, { threshold: 0.1 });
-    if (loaderRef.current) observer.observe(loaderRef.current);
-    return () => observer.disconnect();
+    const obs = new IntersectionObserver(handleObserver, { threshold: 0.1 });
+    if (loaderRef.current) obs.observe(loaderRef.current);
+    return () => obs.disconnect();
   }, [handleObserver]);
 
-  // Reset visible count on search
-  useEffect(() => {
-    setVisibleCount(6);
-  }, [searchTerm]);
+  useEffect(() => { setVisibleCount(6); }, [searchTerm, activeCategory]);
 
-  // 🌀 Loading state
+  const sectionTitle = useMemo(() => {
+    if (!activeCategory) return "Онцлох амралтын газрууд";
+    return getCategoryLabel(activeCategory);
+  }, [activeCategory]);
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
@@ -130,7 +132,6 @@ function Resorts() {
     );
   }
 
-  //  Error state
   if (error) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
@@ -147,16 +148,21 @@ function Resorts() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-teal-50/30 to-emerald-50/30">
-      {/* Header */}
       <Header totalResorts={list.length} totalVisitors={totalVisitors} />
 
-      {/* Hero Section */}
-      <Hero searchTerm={searchTerm} setSearchTerm={setSearchTerm} list={list} totalVisitors={totalVisitors} />
+      <Hero
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        list={list}
+        totalVisitors={totalVisitors}
+        activeCategory={activeCategory}
+        setActiveCategory={setActiveCategory}
+      />
 
-      {/* Resorts Grid */}
-      <section className="container mx-auto px-6 py-12">
+      {/* ↓ id="resorts-section" — scroll target */}
+      <section id="resorts-section" className="container mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">Онцлох амралтын газрууд</h2>
+          <h2 className="text-3xl font-bold text-gray-900">{sectionTitle}</h2>
           <span className="text-gray-500 font-medium">{filteredList.length} газар олдлоо</span>
         </div>
 
@@ -168,40 +174,27 @@ function Resorts() {
                   key={resort._id}
                   className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
                 >
-                  {/* Image */}
                   <div className="relative overflow-hidden h-36 sm:h-48">
                     <img
                       src={resort.image}
                       alt={resort.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-
-                    {/* Like Button */}
                     <button
                       onClick={(e) => toggleFavorite(resort._id, e)}
                       className="absolute top-2 right-2 w-8 h-8 sm:w-12 sm:h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300"
                     >
-                      <Heart
-                        className={`w-4 h-4 sm:w-6 sm:h-6 transition-colors duration-300 ${favorites.has(resort._id)
-                          ? "fill-red-500 text-red-500"
-                          : "text-gray-600"
-                          }`}
-                      />
+                      <Heart className={`w-4 h-4 sm:w-6 sm:h-6 transition-colors duration-300 ${favorites.has(resort._id) ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
                     </button>
-
-                    {/* Category Badge */}
-                    <div className="absolute top-2 left-2 px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-teal-500 to-emerald-500 text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg">
-                      Сувилал
+                    <div className={`absolute top-2 left-2 px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r ${getCategoryGradient(resort.category)} text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg`}>
+                      {getCategoryLabel(resort.category)}
                     </div>
-
-                    {/* Views Counter */}
                     <div className="absolute bottom-2 left-2 px-2 py-1 sm:px-3 sm:py-1.5 bg-black/50 backdrop-blur-sm text-white rounded-full text-xs flex items-center gap-1">
                       <Eye className="w-3 h-3" />
                       {resort.visitors?.toLocaleString() || "2.5k"}
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="p-3 sm:p-6">
                     <div className="mb-2 sm:mb-3">
                       <h3 className="text-base sm:text-xl font-bold text-gray-900 mb-0.5 sm:mb-1 group-hover:text-teal-600 transition-colors leading-tight">
@@ -213,7 +206,6 @@ function Resorts() {
                       </div>
                     </div>
 
-                    {/* Price */}
                     <div className="mb-2 sm:mb-4 pb-2 sm:pb-4 border-b border-gray-100">
                       <span className="text-lg sm:text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
                         {resort.price ? `${parseInt(resort.price).toLocaleString()}₮` : "—"}
@@ -221,17 +213,11 @@ function Resorts() {
                       <span className="text-gray-500 text-xs ml-1">/ хоног</span>
                     </div>
 
-                    {/* Amenities - hide on mobile */}
                     <div className="hidden sm:flex flex-wrap gap-2 mb-4">
-                      <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">
-                        Ресторан
-                      </span>
-                      <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">
-                        WiFi
-                      </span>
+                      <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">Ресторан</span>
+                      <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">WiFi</span>
                     </div>
 
-                    {/* CTA Button */}
                     <Link
                       to={`/details/${resort._id}`}
                       className="w-full py-2 sm:py-3.5 bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-600 hover:to-emerald-600 text-white rounded-xl text-xs sm:text-base font-semibold flex items-center justify-center gap-1 sm:gap-2 transition-all duration-300 shadow-lg hover:shadow-xl group/btn"
@@ -245,7 +231,6 @@ function Resorts() {
               ))}
             </div>
 
-            {/* Infinite scroll sentinel */}
             <div ref={loaderRef} className="flex justify-center py-10">
               {hasMore ? (
                 <div className="flex items-center gap-3 text-teal-600">
@@ -264,7 +249,7 @@ function Resorts() {
         )}
       </section>
 
-      {/* CTA Section */}
+      {/* CTA */}
       <section className="container mx-auto px-6 py-16">
         <div className="relative overflow-hidden bg-gradient-to-r from-teal-600 via-blue-700 to-blue-500 rounded-3xl p-12 text-center text-white shadow-2xl">
           <div className="absolute inset-0 opacity-10">
@@ -272,9 +257,7 @@ function Resorts() {
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           </div>
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">
-              Таны амралтын газар энд байна уу?
-            </h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">Таны амралтын газар энд байна уу?</h2>
             <p className="text-xl text-teal-50 mb-8 max-w-2xl mx-auto">
               Өөрийн амралтын газрыг бүртгүүлж, мянга мянган хүмүүст таниулаарай
             </p>
@@ -296,11 +279,8 @@ function Resorts() {
                 </div>
                 <span className="text-2xl font-bold text-white">Амралтын газар</span>
               </div>
-              <p className="text-gray-400 leading-relaxed">
-                Монголын амралтын газрын мэдээллийн платформ
-              </p>
+              <p className="text-gray-400 leading-relaxed">Монголын амралтын газрын мэдээллийн платформ</p>
             </div>
-
             <div>
               <h3 className="text-white font-bold text-lg mb-4">Холбогдох</h3>
               <ul className="space-y-3">
@@ -319,7 +299,6 @@ function Resorts() {
               </ul>
             </div>
           </div>
-
           <div className="border-t border-gray-800 pt-8 text-center text-gray-500">
             <p>© 2026 Амралтын газар</p>
           </div>

@@ -37,9 +37,7 @@ export const getResortById = async (req, res) => {
   try {
     const resort = await Resort.findById(req.params.id);
     if (!resort) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Resort not found" });
+      return res.status(404).json({ success: false, message: "Resort not found" });
     }
 
     const files = await File.findOne({ resortId: resort._id });
@@ -57,28 +55,21 @@ export const getResortById = async (req, res) => {
 
 export const createResort = async (req, res) => {
   try {
-    let { name, description, phone, price, location, lat, lng, images, videos } =
-      req.body;
+    let {
+      name, description, phone, price, location, lat, lng,
+      images, videos,
+      category, // ← шинэ
+    } = req.body;
 
     try {
-      if (typeof images === "string") {
-        try {
-          images = JSON.parse(images);
-        } catch {}
-      }
-      if (typeof videos === "string") {
-        try {
-          videos = JSON.parse(videos);
-        } catch {}
-      }
+      if (typeof images === "string") { try { images = JSON.parse(images); } catch {} }
+      if (typeof videos === "string") { try { videos = JSON.parse(videos); } catch {} }
     } catch (err) {
       console.log("JSON parse error:", err);
     }
 
     if (!name) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Name is required" });
+      return res.status(400).json({ success: false, message: "Name is required" });
     }
 
     if (!lat || !lng) {
@@ -92,11 +83,12 @@ export const createResort = async (req, res) => {
     const parsedLng = parseFloat(lng);
 
     if (isNaN(parsedLat) || isNaN(parsedLng)) {
-      return res.status(400).json({
-        success: false,
-        message: "lat/lng нь тоо байх ёстой!",
-      });
+      return res.status(400).json({ success: false, message: "lat/lng нь тоо байх ёстой!" });
     }
+
+    // category validation
+    const validCategories = ["suvilal", "juulchnii_baaz", "uzseglent_gazar"];
+    const safeCategory = validCategories.includes(category) ? category : "suvilal";
 
     const newResort = await Resort.create({
       name,
@@ -106,6 +98,7 @@ export const createResort = async (req, res) => {
       lat: parsedLat,
       lng: parsedLng,
       price,
+      category: safeCategory, // ← хадгалж байна
     });
 
     const newFiles = new File({
@@ -132,26 +125,16 @@ export const updateResort = async (req, res) => {
     const { id } = req.params;
 
     let {
-      name,
-      description,
-      phone,
-      price,
-      location,
-      lat,
-      lng,
-      newImages,
-      newVideos,
-      removedImages,
-      removedVideos,
+      name, description, phone, price, location, lat, lng,
+      newImages, newVideos, removedImages, removedVideos,
+      category, // ← шинэ
     } = req.body;
 
     try {
       if (typeof newImages === "string") newImages = JSON.parse(newImages);
       if (typeof newVideos === "string") newVideos = JSON.parse(newVideos);
-      if (typeof removedImages === "string")
-        removedImages = JSON.parse(removedImages);
-      if (typeof removedVideos === "string")
-        removedVideos = JSON.parse(removedVideos);
+      if (typeof removedImages === "string") removedImages = JSON.parse(removedImages);
+      if (typeof removedVideos === "string") removedVideos = JSON.parse(removedVideos);
     } catch (e) {
       console.log("JSON parse error:", e);
     }
@@ -163,22 +146,15 @@ export const updateResort = async (req, res) => {
 
     const resort = await Resort.findById(id);
     if (!resort) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Resort not found" });
+      return res.status(404).json({ success: false, message: "Resort not found" });
     }
 
     if (lat !== undefined && lng !== undefined) {
       const parsedLat = parseFloat(lat);
       const parsedLng = parseFloat(lng);
-
       if (isNaN(parsedLat) || isNaN(parsedLng)) {
-        return res.status(400).json({
-          success: false,
-          message: "lat/lng нь тоо байх ёстой!",
-        });
+        return res.status(400).json({ success: false, message: "lat/lng нь тоо байх ёстой!" });
       }
-
       resort.lat = parsedLat;
       resort.lng = parsedLng;
     }
@@ -188,6 +164,12 @@ export const updateResort = async (req, res) => {
     if (phone) resort.phone = phone;
     if (location) resort.location = location;
     if (price !== undefined) resort.price = Number(price);
+
+    // category шинэчлэлт
+    const validCategories = ["suvilal", "juulchnii_baaz", "uzseglent_gazar"];
+    if (category && validCategories.includes(category)) {
+      resort.category = category;
+    }
 
     await resort.save();
 
@@ -199,25 +181,15 @@ export const updateResort = async (req, res) => {
     for (const url of removedImages) {
       const publicId = extractPublicId(url);
       if (!publicId) continue;
-      try {
-        await cloudinary.uploader.destroy(publicId);
-      } catch (err) {
-        console.error("Cloudinary image delete error:", err);
-      }
+      try { await cloudinary.uploader.destroy(publicId); } catch (err) { console.error("Cloudinary image delete error:", err); }
     }
-
     files.images = files.images.filter((img) => !removedImages.includes(img));
 
     for (const url of removedVideos) {
       const publicId = extractPublicId(url);
       if (!publicId) continue;
-      try {
-        await cloudinary.uploader.destroy(publicId, { resource_type: "video" });
-      } catch (err) {
-        console.error("Cloudinary video delete error:", err);
-      }
+      try { await cloudinary.uploader.destroy(publicId, { resource_type: "video" }); } catch (err) { console.error("Cloudinary video delete error:", err); }
     }
-
     files.videos = files.videos.filter((v) => !removedVideos.includes(v));
 
     if (newImages.length) files.images.push(...newImages);
@@ -237,7 +209,6 @@ export const updateResort = async (req, res) => {
   }
 };
 
-// ✅ deleteResort
 export const deleteResort = async (req, res) => {
   try {
     const { id } = req.params;
@@ -247,30 +218,15 @@ export const deleteResort = async (req, res) => {
       return res.status(404).json({ success: false, message: "Resort not found" });
     }
 
-    // findOne() 
     const files = await File.findOne({ resortId: id });
 
     if (files) {
-      // ✅ try/catch delete 
       for (const img of files.images || []) {
-        try {
-          await cloudinary.uploader.destroy(extractPublicId(img));
-        } catch (err) {
-          console.error("Cloudinary image delete error:", err);
-        }
+        try { await cloudinary.uploader.destroy(extractPublicId(img)); } catch (err) { console.error("Cloudinary image delete error:", err); }
       }
-
       for (const vid of files.videos || []) {
-        try {
-          await cloudinary.uploader.destroy(extractPublicId(vid), {
-            resource_type: "video",
-          });
-        } catch (err) {
-          console.error("Cloudinary video delete error:", err);
-        }
+        try { await cloudinary.uploader.destroy(extractPublicId(vid), { resource_type: "video" }); } catch (err) { console.error("Cloudinary video delete error:", err); }
       }
-
-      // ✅устгасан
       await File.findByIdAndDelete(files._id);
     }
 

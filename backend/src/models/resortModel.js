@@ -18,21 +18,27 @@ const resortSchema = new mongoose.Schema(
 
     phone: {
       type: Number
-      
+
     },
 
     price: Number,
 
-  status: {
-    type: String,
-    enum: ["pending", "approved"],
-    default: "pending",
-  },
+    status: {
+      type: String,
+      enum: ["pending", "approved"],
+      default: "pending",
+    },
 
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+    category: {
+      type: String,
+      enum: ["suvilal", "juulchnii_baaz", "uzseglent_gazar"],
+      default: "suvilal",
+    },
+
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
   { timestamps: true }
 );
