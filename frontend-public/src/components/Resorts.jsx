@@ -1,4 +1,10 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import React, {
+  useState,
+  useMemo,
+  useEffect,
+  useRef,
+  useCallback,
+} from "react";
 import { Link } from "react-router-dom";
 import { Eye, MapPin, Heart, ChevronRight } from "lucide-react";
 import Header from "./Header";
@@ -8,8 +14,14 @@ const API_BASE = import.meta.env.VITE_API_URL;
 
 const CATEGORY_CONFIG = {
   suvilal: { label: "Сувилал", gradient: "from-teal-500 to-emerald-500" },
-  juulchnii_baaz: { label: "Жуулчны бааз", gradient: "from-blue-500 to-indigo-500" },
-  uzseglent_gazar: { label: "Үзэсгэлэнт газар", gradient: "from-purple-500 to-pink-500" },
+  juulchnii_baaz: {
+    label: "Жуулчны бааз",
+    gradient: "from-blue-500 to-indigo-500",
+  },
+  uzseglent_gazar: {
+    label: "Үзэсгэлэнт газар",
+    gradient: "from-purple-500 to-pink-500",
+  },
 };
 
 function getCategoryLabel(cat) {
@@ -67,7 +79,9 @@ function Resorts() {
     }
   }
 
-  useEffect(() => { fetchResorts(); }, []);
+  useEffect(() => {
+    fetchResorts();
+  }, []);
 
   // Search + Category filter
   const filteredList = useMemo(() => {
@@ -82,7 +96,7 @@ function Resorts() {
           p.name?.toLowerCase().includes(term) ||
           p.price?.toString().includes(term) ||
           p.description?.toLowerCase().includes(term) ||
-          p.location?.toLowerCase().includes(term)
+          p.location?.toLowerCase().includes(term),
       );
     }
     return result;
@@ -96,14 +110,24 @@ function Resorts() {
     setFavorites(next);
   };
 
-  const totalVisitors = useMemo(() => list.reduce((s, r) => s + (r.visitors || 0), 0), [list]);
+  const totalVisitors = useMemo(
+    () => list.reduce((s, r) => s + (r.visitors || 0), 0),
+    [list],
+  );
 
-  const visibleItems = useMemo(() => filteredList.slice(0, visibleCount), [filteredList, visibleCount]);
+  const visibleItems = useMemo(
+    () => filteredList.slice(0, visibleCount),
+    [filteredList, visibleCount],
+  );
   const hasMore = visibleCount < filteredList.length;
 
-  const handleObserver = useCallback((entries) => {
-    if (entries[0].isIntersecting && hasMore) setVisibleCount((p) => p + PAGE_SIZE);
-  }, [hasMore]);
+  const handleObserver = useCallback(
+    (entries) => {
+      if (entries[0].isIntersecting && hasMore)
+        setVisibleCount((p) => p + PAGE_SIZE);
+    },
+    [hasMore],
+  );
 
   useEffect(() => {
     const obs = new IntersectionObserver(handleObserver, { threshold: 0.1 });
@@ -111,7 +135,9 @@ function Resorts() {
     return () => obs.disconnect();
   }, [handleObserver]);
 
-  useEffect(() => { setVisibleCount(6); }, [searchTerm, activeCategory]);
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [searchTerm, activeCategory]);
 
   const sectionTitle = useMemo(() => {
     if (!activeCategory) return "Онцлох амралтын газрууд";
@@ -125,7 +151,9 @@ function Resorts() {
         <div className="min-h-[80vh] flex items-center justify-center">
           <div className="text-center">
             <div className="text-7xl mb-6 animate-bounce">⏳</div>
-            <div className="text-2xl text-gray-700 font-semibold">Мэдээлэл ачаалж байна...</div>
+            <div className="text-2xl text-gray-700 font-semibold">
+              Мэдээлэл ачаалж байна...
+            </div>
           </div>
         </div>
       </div>
@@ -138,7 +166,9 @@ function Resorts() {
         <Header totalResorts={0} totalVisitors={0} />
         <div className="min-h-[80vh] flex items-center justify-center">
           <div className="text-center">
-            <div className="text-2xl text-green-600 font-semibold mb-4">Мэдээлэл ачаалж байна...</div>
+            <div className="text-2xl text-green-600 font-semibold mb-4">
+              Мэдээлэл ачаалж байна...
+            </div>
             <div className="text-gray-600">{error}</div>
           </div>
         </div>
@@ -163,7 +193,9 @@ function Resorts() {
       <section id="resorts-section" className="container mx-auto px-6 py-12">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900">{sectionTitle}</h2>
-          <span className="text-gray-500 font-medium">{filteredList.length} газар олдлоо</span>
+          <span className="text-gray-500 font-medium">
+            {filteredList.length} газар олдлоо
+          </span>
         </div>
 
         {filteredList.length > 0 ? (
@@ -184,9 +216,13 @@ function Resorts() {
                       onClick={(e) => toggleFavorite(resort._id, e)}
                       className="absolute top-2 right-2 w-8 h-8 sm:w-12 sm:h-12 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform duration-300"
                     >
-                      <Heart className={`w-4 h-4 sm:w-6 sm:h-6 transition-colors duration-300 ${favorites.has(resort._id) ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
+                      <Heart
+                        className={`w-4 h-4 sm:w-6 sm:h-6 transition-colors duration-300 ${favorites.has(resort._id) ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+                      />
                     </button>
-                    <div className={`absolute top-2 left-2 px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r ${getCategoryGradient(resort.category)} text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg`}>
+                    <div
+                      className={`absolute top-2 left-2 px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r ${getCategoryGradient(resort.category)} text-white rounded-full text-xs sm:text-sm font-semibold shadow-lg`}
+                    >
                       {getCategoryLabel(resort.category)}
                     </div>
                     <div className="absolute bottom-2 left-2 px-2 py-1 sm:px-3 sm:py-1.5 bg-black/50 backdrop-blur-sm text-white rounded-full text-xs flex items-center gap-1">
@@ -208,14 +244,22 @@ function Resorts() {
 
                     <div className="mb-2 sm:mb-4 pb-2 sm:pb-4 border-b border-gray-100">
                       <span className="text-lg sm:text-3xl font-bold bg-gradient-to-r from-teal-600 to-emerald-600 bg-clip-text text-transparent">
-                        {resort.price ? `${parseInt(resort.price).toLocaleString()}₮` : "—"}
+                        {resort.price
+                          ? `${parseInt(resort.price).toLocaleString()}₮`
+                          : "—"}
                       </span>
-                      <span className="text-gray-500 text-xs ml-1">/ хоног</span>
+                      <span className="text-gray-500 text-xs ml-1">
+                        / хоног
+                      </span>
                     </div>
 
                     <div className="hidden sm:flex flex-wrap gap-2 mb-4">
-                      <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">Ресторан</span>
-                      <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">WiFi</span>
+                      <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">
+                        Ресторан
+                      </span>
+                      <span className="px-3 py-1 bg-teal-50 text-teal-700 rounded-full text-xs font-medium">
+                        WiFi
+                      </span>
                     </div>
 
                     <Link
@@ -234,11 +278,18 @@ function Resorts() {
             <div ref={loaderRef} className="flex justify-center py-10">
               {hasMore ? (
                 <div className="flex items-center gap-3 text-teal-600">
-                  <div className="w-6 h-6 border-3 border-teal-500 border-t-transparent rounded-full animate-spin" style={{ borderWidth: "3px" }} />
-                  <span className="font-medium text-gray-500">Ачаалж байна...</span>
+                  <div
+                    className="w-6 h-6 border-3 border-teal-500 border-t-transparent rounded-full animate-spin"
+                    style={{ borderWidth: "3px" }}
+                  />
+                  <span className="font-medium text-gray-500">
+                    Ачаалж байна...
+                  </span>
                 </div>
               ) : (
-                <p className="text-gray-400 font-medium">Бүх амралт харагдаж байна ({filteredList.length})</p>
+                <p className="text-gray-400 font-medium">
+                  Бүх амралт харагдаж байна ({filteredList.length})
+                </p>
               )}
             </div>
           </>
@@ -257,7 +308,9 @@ function Resorts() {
             <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
           </div>
           <div className="relative z-10">
-            <h2 className="text-4xl md:text-5xl font-bold mb-6">Таны амралтын газар энд байна уу?</h2>
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              Таны амралтын газар энд байна уу?
+            </h2>
             <p className="text-xl text-teal-50 mb-8 max-w-2xl mx-auto">
               Өөрийн амралтын газрыг бүртгүүлж, мянга мянган хүмүүст таниулаарай
             </p>
@@ -277,22 +330,46 @@ function Resorts() {
                 <div className="w-12 h-12 bg-teal-500 rounded-2xl flex items-center justify-center">
                   <span className="text-2xl">🌿</span>
                 </div>
-                <span className="text-2xl font-bold text-white">Амралтын газар</span>
+                <span className="text-2xl font-bold text-white">
+                  Амралтын газар
+                </span>
               </div>
-              <p className="text-gray-400 leading-relaxed">Монголын амралтын газрын мэдээллийн платформ</p>
+              <p className="text-gray-400 leading-relaxed">
+                Монголын амралтын газрын мэдээллийн платформ
+              </p>
             </div>
             <div>
               <h3 className="text-white font-bold text-lg mb-4">Холбогдох</h3>
               <ul className="space-y-3">
                 <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  <svg
+                    className="w-5 h-5 text-teal-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
+                    />
                   </svg>
                   <span>+976 91354449</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <svg className="w-5 h-5 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  <svg
+                    className="w-5 h-5 text-teal-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                    />
                   </svg>
                   <span>info@amraltingazar.mn</span>
                 </li>
