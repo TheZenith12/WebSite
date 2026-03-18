@@ -1,10 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import { Users, MapPin } from "lucide-react";
 
-function Header({ stats }) {
-  const { visitors = 0, count = 0 } = stats;
-
+function Header({ totalVisitors = 0, totalResorts = 0 }) {
   return (
 <header className="bg-gradient-to-r from-teal-600 via-blue-700 to-blue-500 text-white shadow-2xl sticky top-0 z-50 w-full">
       <div className="w-full px-6 py-3 max-w-[1400px] mx-auto">
@@ -29,7 +26,7 @@ function Header({ stats }) {
             <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full hover:bg-white/30 transition-all duration-300 cursor-pointer">
               <MapPin className="w-5 h-5" />
               <div className="text-sm">
-                  {totalResorts}
+                <div className="font-bold text-lg">{totalResorts}</div>
                 <div className="text-xs opacity-90">Амралтын газар</div>
               </div>
             </div>
