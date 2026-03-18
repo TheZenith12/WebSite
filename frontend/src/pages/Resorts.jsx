@@ -26,19 +26,19 @@ function Resorts() {
   }
 
   async function fetchPageViews() {
-  try {
-    const res = await fetch(`${API_BASE}/api/stats`);
-    const data = await res.json();
-    setPageViews(data.pageViews);
-  } catch (err) {
-    console.error(err);
+    try {
+      const res = await fetch(`${API_BASE}/api/stats`);
+      const data = await res.json();
+      setPageViews(data.pageViews);
+    } catch (err) {
+      console.error(err);
+    }
   }
-}
 
-useEffect(() => {
-  fetchResorts();
-  fetchPageViews();
-}, []);
+  useEffect(() => {
+    fetchResorts();
+    fetchPageViews();
+  }, []);
 
   // 🔹 Resort устгах
   async function removeResort(id) {
@@ -77,19 +77,19 @@ useEffect(() => {
             className="p-4 bg-white rounded-lg shadow flex justify-between items-start"
           >
             <div className="flex gap-4">
-         <img
-      src={
-        r.images && r.images.length > 0
-          ? r.images[0].url
-          : "/placeholder.jpg"
-      }
-      onError={(e) => {
-        e.target.onerror = null;
-        e.target.src = "/placeholder.jpg";
-      }}
-      className="w-24 h-24 object-cover rounded"
-      alt={r.name}
-    />
+              <img
+                src={
+                  r.images && r.images.length > 0
+                    ? r.images[0].url
+                    : "/placeholder.jpg"
+                }
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = "/placeholder.jpg";
+                }}
+                className="w-24 h-24 object-cover rounded"
+                alt={r.name}
+              />
 
               <div>
                 <div className="font-semibold text-lg">{r.name}</div>
@@ -99,7 +99,7 @@ useEffect(() => {
                 <div className="text-gray-800 text-sm">
                   phone:{" "}
                   <span className="font-semibold">
-                    {r.phone ? `${r.phone} ` : "********"}
+                    {r.phone ? `${r.phone} ` :"_"}
                   </span>
                 </div>
                 <div className="text-gray-800 text-sm">
@@ -130,7 +130,7 @@ useEffect(() => {
             </div>
           </div>
         ))}
-        
+
 
         {!loading && list.length === 0 && (
           <div className="text-gray-500">No resorts found.</div>

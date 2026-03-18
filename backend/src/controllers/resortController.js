@@ -57,7 +57,7 @@ export const getResortById = async (req, res) => {
 
 export const createResort = async (req, res) => {
   try {
-    let { name, description, price, location, lat, lng, images, videos } =
+    let { name, description, phone, price, location, lat, lng, images, videos } =
       req.body;
 
     try {
@@ -101,6 +101,7 @@ export const createResort = async (req, res) => {
     const newResort = await Resort.create({
       name,
       description,
+      phone,
       location,
       lat: parsedLat,
       lng: parsedLng,
@@ -133,6 +134,7 @@ export const updateResort = async (req, res) => {
     let {
       name,
       description,
+      phone,
       price,
       location,
       lat,
@@ -183,6 +185,7 @@ export const updateResort = async (req, res) => {
 
     if (name) resort.name = name;
     if (description) resort.description = description;
+    if (phone) resort.phone = phone;
     if (location) resort.location = location;
     if (price !== undefined) resort.price = Number(price);
 
