@@ -15,7 +15,7 @@ export default function Details() {
   const [loading, setLoading] = useState(true);
 
 
-  const [reviews, setReviews] = useState([]);
+  const [reviews,] = useState([]);
   const [userName, setUserName] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
