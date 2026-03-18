@@ -97,10 +97,7 @@ function Resorts() {
                   {r.description || "No description"}
                 </div>
                 <div className="text-gray-800 text-sm">
-                  phone:{" "}
-                  <span className="font-semibold">
-                    {r.phone ? `${r.phone} ` :"_"}
-                  </span>
+                  phone:{r.phone || " "}
                 </div>
                 <div className="text-gray-800 text-sm">
                   💰 Үнэ:{" "}
