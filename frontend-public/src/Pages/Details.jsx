@@ -14,11 +14,6 @@ export default function Details() {
   const [currentImg, setCurrentImg] = useState("");
   const [loading, setLoading] = useState(true);
 
-
-  const [reviews, setReviews] = useState([]);
-  const [userName, setUserName] = useState("");
-  const [comment, setComment] = useState("");
-  const [rating, setRating] = useState(5);
   const [isLiked, setIsLiked] = useState(false);
 
   const mapRef = useRef(null);
@@ -53,9 +48,6 @@ export default function Details() {
       );
 
       setVideos(fullVids);
-
-      // ⭐ reviews татах
-      fetchReviews(id);
 
       setLoading(false);
     } catch (err) {
@@ -121,39 +113,6 @@ export default function Details() {
       initMap();
     }
   }, [resort]);
-
-  const fetchReviews = async (resortId) => {
-  try {
-    const res = await axios.get(
-      `${API_BASE}/api/reviews/${resortId}`
-    );
-    setReviews(res.data || []);
-  } catch (err) {
-    console.error("Fetch reviews error", err);
-    setReviews([]);
-  }
-};
-
-const handleSubmit = async (e) => {
-  e.preventDefault();
-
-  try {
-    await axios.post(`${API_BASE}/api/reviews`, {
-      resort: id,
-      userName,
-      comment,
-      rating,
-    });
-
-    setUserName("");
-    setComment("");
-    setRating(5);
-
-    fetchReviews(id); // дахин татах
-  } catch (err) {
-    console.error("Submit review error", err);
-  }
-};
 
   if (loading) {
     return (
