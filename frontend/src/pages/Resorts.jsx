@@ -79,7 +79,7 @@ function Resorts() {
           >
             <div className="flex gap-4">
               <img
-                src={r.img}
+                src={r.image || "https://via.placeholder.com/100x80?text=No+Image"}
                 alt={r.name}
               />
 
