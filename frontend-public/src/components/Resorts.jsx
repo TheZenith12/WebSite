@@ -137,7 +137,7 @@ function Resorts() {
         <Header totalResorts={0} totalVisitors={0} />
         <div className="min-h-[80vh] flex items-center justify-center">
           <div className="text-center">
-            <div className="text-2xl text-red-600 font-semibold mb-4">Алдаа гарлаа</div>
+            <div className="text-2xl text-red-600 font-semibold mb-4">Мэдээлэл ачаалж байна...</div>
             <div className="text-gray-600">{error}</div>
           </div>
         </div>
