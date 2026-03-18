@@ -79,16 +79,7 @@ function Resorts() {
           >
             <div className="flex gap-4">
               <img
-                src={
-                  r.images && r.images.length > 0
-                    ? r.images[0].url
-                    : "/placeholder.jpg"
-                }
-                onError={(e) => {
-                  e.target.onerror = null;
-                  e.target.src = "/placeholder.jpg";
-                }}
-                className="w-24 h-24 object-cover rounded"
+                src={r.image}
                 alt={r.name}
               />
 
