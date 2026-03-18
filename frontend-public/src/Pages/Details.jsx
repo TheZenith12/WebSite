@@ -51,8 +51,7 @@ export default function Details() {
             : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
         );
         setVideos(fullVids);
-
-        fetchReviews();
+        
       } catch (err) {
         console.error("Fetch resort error:", err);
       } finally {
@@ -130,7 +129,6 @@ export default function Details() {
       setUserName("");
       setComment("");
       setRating(5);
-      fetchReviews();
     } catch (err) {
       console.error("Submit review error:", err);
     }
