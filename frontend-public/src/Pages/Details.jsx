@@ -118,16 +118,6 @@ export default function Details() {
     }
   }, [resort]);
 
-  // Fetch Reviews
-  const fetchReviews = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/api/reviews/${id}`);
-      setReviews(res.data);
-    } catch (err) {
-      console.error("Fetch reviews error:", err);
-    }
-  };
-
   // Submit Review
   const handleSubmit = async (e) => {
     e.preventDefault();
