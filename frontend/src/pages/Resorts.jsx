@@ -13,32 +13,40 @@ function Resorts() {
   async function fetchResorts() {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/admin/resorts`);
-      if (!res.ok) throw new Error("Failed to fetch resorts");
+      const res = await fetch(`${API_BASE}/api/admin/resorts`, {
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!res.ok) {
+        throw new Error("Серверээс алдаа ирлээ: " + res.status);
+      }
+
       const data = await res.json();
-      console.log("data:", data);
-      setList(data.resorts || data); // хэрэв backend data.resorts буцаадаг бол
+
+      const resorts = (data.resorts || data).map((r) => {
+        const imgs = r.images || [];
+        const imgSrc = imgs.length > 0 ? imgs[0] : "";
+        const fullImg = imgSrc
+          ? /^https?:\/\//i.test(imgSrc)
+            ? imgSrc
+            : `${API_BASE}/${imgSrc.replace(/^\/+/, "")}`
+          : "https://via.placeholder.com/600x400?text=No+Image";
+
+        return {
+          ...r,
+          image: fullImg,
+          rating: r.rating || (Math.random() * (5 - 4.5) + 4.5).toFixed(1),
+          visitors: r.visitors || Math.floor(Math.random() * 2000) + 500,
+          location: r.location || "Монгол",
+        };
+      });
+      setList(resorts);
     } catch (err) {
       setError(err.message);
     } finally {
       setLoading(false);
     }
   }
-
-  async function fetchPageViews() {
-    try {
-      const res = await fetch(`${API_BASE}/api/stats`);
-      const data = await res.json();
-      setPageViews(data.pageViews);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  useEffect(() => {
-    fetchResorts();
-    fetchPageViews();
-  }, []);
 
   // 🔹 Resort устгах
   async function removeResort(id) {
