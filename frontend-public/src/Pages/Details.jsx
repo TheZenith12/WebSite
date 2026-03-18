@@ -14,50 +14,54 @@ export default function Details() {
   const [currentImg, setCurrentImg] = useState("");
   const [loading, setLoading] = useState(true);
 
+
+  const [reviews, setReviews] = useState([]);
+  const [userName, setUserName] = useState("");
+  const [comment, setComment] = useState("");
+  const [rating, setRating] = useState(5);
   const [isLiked, setIsLiked] = useState(false);
 
   const mapRef = useRef(null);
 
   // Fetch Resort Data
   useEffect(() => {
-  async function fetchData() {
-    try {
-      const res = await fetch(`${API_BASE}/api/admin/resorts/${id}`);
-      const data = await res.json();
+    async function fetchData() {
+      try {
+        const res = await fetch(`${API_BASE}/api/admin/resorts/${id}`);
+        const data = await res.json();
 
-      setResort(data.resort || data);
+        setResort(data.resort || data);
 
-      const imgs = data.files?.images || [];
-      const fullImgs = imgs.map((src) =>
-        /^https?:\/\//i.test(src)
-          ? src
-          : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
-      );
-
-      setImages(fullImgs);
-      setCurrentImg(
-        fullImgs[0] ||
+        const imgs = data.files?.images || [];
+        const fullImgs = imgs.map((src) =>
+          /^https?:\/\//i.test(src)
+            ? src
+            : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
+        );
+        setImages(fullImgs);
+        setCurrentImg(
+          fullImgs[0] ||
           "https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&q=80"
-      );
+        );
 
-      const vids = data.files?.videos || [];
-      const fullVids = vids.map((src) =>
-        /^https?:\/\//i.test(src)
-          ? src
-          : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
-      );
+        const vids = data.files?.videos || [];
+        const fullVids = vids.map((src) =>
+          /^https?:\/\//i.test(src)
+            ? src
+            : `${API_BASE}${src.startsWith("/") ? src : `/${src}`}`
+        );
+        setVideos(fullVids);
 
-      setVideos(fullVids);
-
-      setLoading(false);
-    } catch (err) {
-      console.error("Fetch resort error", err);
-      setLoading(false);
+        fetchReviews();
+      } catch (err) {
+        console.error("Fetch resort error:", err);
+      } finally {
+        setLoading(false);
+      }
     }
-  }
 
-  fetchData();
-}, [id]);
+    fetchData();
+  }, [id]);
 
   // Google Maps
   useEffect(() => {
@@ -113,6 +117,34 @@ export default function Details() {
       initMap();
     }
   }, [resort]);
+
+  // Fetch Reviews
+  const fetchReviews = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/api/reviews/${id}`);
+      setReviews(res.data);
+    } catch (err) {
+      console.error("Fetch reviews error:", err);
+    }
+  };
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await axios.post(`${API_BASE}/api/reviews/${id}`, {
+        userName,
+        rating,
+        comment,
+      });
+      setUserName("");
+      setComment("");
+      setRating(5);
+      fetchReviews();
+    } catch (err) {
+      console.error("Submit review error:", err);
+    }
+  };
 
   if (loading) {
     return (
