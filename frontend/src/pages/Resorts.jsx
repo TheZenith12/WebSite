@@ -59,7 +59,7 @@ function Resorts() {
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold">🏕 Амралтын газрууд</h2>
+        <h2 className="text-xl font-semibold">Амралтын газрууд</h2>
         <Link
           to="/resorts/new"
           className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"

@@ -4,7 +4,7 @@ const CATEGORIES = [
   {
     key: "suvilal",
     label: "Амралтын газар",
-    icon: "🏥",
+    icon: "🛌",
     bg: "bg-gradient-to-br from-teal-500 to-emerald-600",
   },
   {
@@ -16,7 +16,7 @@ const CATEGORIES = [
   {
     key: "uzseglent_gazar",
     label: "Байгалийн үзэсгэлэнт",
-    icon: "🏔️",
+    icon: "🌿",
     bg: "bg-gradient-to-br from-purple-500 to-pink-600",
   },
 ];
