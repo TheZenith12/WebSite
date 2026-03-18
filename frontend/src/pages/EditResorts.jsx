@@ -6,9 +6,9 @@ import { uploadToCloudinary } from "../utils/uploadToCloudinary";
 const API_BASE = import.meta.env.VITE_API_URL;
 
 const CATEGORIES = [
-  { key: "suvilal", label: "Амралтын газар", icon: "🏥", color: "from-teal-500 to-emerald-500" },
+  { key: "suvilal", label: "Амралтын газар", icon: "🛌", color: "from-teal-500 to-emerald-500" },
   { key: "juulchnii_baaz", label: "Жуулчны бааз", icon: "⛺", color: "from-blue-500 to-indigo-500" },
-  { key: "uzseglent_gazar", label: "Байгалийн үзэсгэлэнт", icon: "🏔️", color: "from-purple-500 to-pink-500" },
+  { key: "uzseglent_gazar", label: "Байгалийн үзэсгэлэнт", icon: "🌿", color: "from-purple-500 to-pink-500" },
 ];
 
 function EditResort() {
@@ -120,7 +120,7 @@ function EditResort() {
         removedVideos,
       });
 
-      alert("Амжилттай шинэчлэв 🎉");
+      alert("Амжилттай шинэчлээ 🎉");
       navigate("/resorts");
     } catch (err) {
       console.error(err);
