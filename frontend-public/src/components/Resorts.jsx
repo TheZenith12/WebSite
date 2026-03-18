@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Eye, MapPin, Star, Heart, ChevronRight } from "lucide-react";
+import { Eye, MapPin, Heart, ChevronRight } from "lucide-react";
 import Header from "./Header";
 import Hero from "./Hero";
 

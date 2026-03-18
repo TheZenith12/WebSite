@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 import { Users, MapPin } from "lucide-react";
 
 function Header({ totalVisitors = 0, totalResorts = 0 }) {
@@ -26,8 +27,10 @@ function Header({ totalVisitors = 0, totalResorts = 0 }) {
             <div className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full hover:bg-white/30 transition-all duration-300 cursor-pointer">
               <MapPin className="w-5 h-5" />
               <div className="text-sm">
-                <div className="font-bold text-lg">{totalResorts}</div>
-                <div className="text-xs opacity-90">Амралтын газар</div>
+               <Link to="/resorts" className="flex items-center gap-1">
+  <div className="font-bold text-lg">{totalResorts}</div>
+  <div className="text-xs opacity-90">Амралтын газар</div>
+</Link>
               </div>
             </div>
           </div>
