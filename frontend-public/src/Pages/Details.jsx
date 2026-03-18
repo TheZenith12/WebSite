@@ -14,8 +14,6 @@ export default function Details() {
   const [currentImg, setCurrentImg] = useState("");
   const [loading, setLoading] = useState(true);
 
-
-  const [reviews,] = useState([]);
   const [userName, setUserName] = useState("");
   const [comment, setComment] = useState("");
   const [rating, setRating] = useState(5);
@@ -52,7 +50,6 @@ export default function Details() {
         );
         setVideos(fullVids);
 
-        fetchReviews();
       } catch (err) {
         console.error("Fetch resort error:", err);
       } finally {
