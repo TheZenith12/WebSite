@@ -12,8 +12,8 @@ import authRoutes from "./src/routes/auth.js";
 import resortRoutes from "./src/routes/resorts.js";
 import fileRoutes from "./src/routes/fileRoutes.js";
 
-// Middleware
-const app = express();
+const app = express(); // ← энэ дутуу байсан
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -60,13 +60,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: err.message });
 });
 
-//gh
-
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
 
 export default app;
