@@ -79,7 +79,7 @@ function Resorts() {
           >
             <div className="flex gap-4">
               <img
-                src={r.image}
+                src={r.img}
                 alt={r.name}
               />
 
