@@ -135,7 +135,7 @@ export default function AddResort() {
         <textarea
           name="phone"
           placeholder="утас"
-          value={form.description}
+          value={form.phone}
           onChange={handleChange}
           className="border w-full px-3 py-2 rounded"
         />
