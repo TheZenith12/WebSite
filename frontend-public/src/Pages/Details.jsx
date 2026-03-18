@@ -118,33 +118,6 @@ export default function Details() {
     }
   }, [resort]);
 
-  // Fetch Reviews
-  const fetchReviews = async () => {
-    try {
-      const res = await axios.get(`${API_BASE}/api/reviews/${id}`);
-      setReviews(res.data);
-    } catch (err) {
-      console.error("Fetch reviews error:", err);
-    }
-  };
-
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post(`${API_BASE}/api/reviews/${id}`, {
-        userName,
-        rating,
-        comment,
-      });
-      setUserName("");
-      setComment("");
-      setRating(5);
-      fetchReviews();
-    } catch (err) {
-      console.error("Submit review error:", err);
-    }
-  };
 
   if (loading) {
     return (
