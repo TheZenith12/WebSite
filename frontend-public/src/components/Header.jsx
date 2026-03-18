@@ -24,7 +24,9 @@ function Header({ totalVisitors = 0, totalResorts = 0 }) {
               </div>
             </div>
 
-            
+
+
+
             <div
               className="flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full hover:bg-white/30 transition-all duration-300 cursor-pointer"
               onClick={() =>
