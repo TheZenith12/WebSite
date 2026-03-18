@@ -49,7 +49,7 @@ function Resorts() {
         method: "DELETE",
       });
       if (!res.ok) throw new Error("Failed to delete resort");
-      setList(list.filter((r) => r._id !== id));
+      setList(list.filter((resort) => resort._id !== id));
       
     } catch (err) {
       alert(err.message);
@@ -72,15 +72,15 @@ function Resorts() {
       {error && <div className="text-red-600">{error}</div>}
 
       <div className="space-y-3">
-        {list.map((r) => (
+        {list.map((resort) => (
           <div
-            key={r._id}
+            key={resort._id}
             className="p-4 bg-white rounded-lg shadow flex justify-between items-start"
           >
             <div className="flex gap-4">
               <img
-                      src={r.image}
-                      alt={r.name}
+                      src={resort.image}
+                      alt={resort.name}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
 
