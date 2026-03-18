@@ -79,40 +79,40 @@ function Resorts() {
           >
             <div className="flex gap-4">
               <img
-                      src={resort.image}
-                      alt={resort.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
+                 src={resort.image}
+                 alt={resort.name}
+                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+               />
 
               <div>
-                <div className="font-semibold text-lg">{r.name}</div>
+                <div className="font-semibold text-lg">{resort.name}</div>
                 <div className="text-gray-600 text-sm mb-1">
-                  {r.description || "No description"}
+                  {resort.description || "No description"}
                 </div>
                 <div className="text-gray-800 text-sm">
-                  phone:{r.phone || " "}
+                  phone:{resort.phone || " "}
                 </div>
                 <div className="text-gray-800 text-sm">
                   💰 Үнэ:{" "}
                   <span className="font-semibold">
-                    {r.price ? `${r.price} ₮` : "—"}
+                    {resort.price ? `${resort.price} ₮` : "—"}
                   </span>
                 </div>
                 <div className="text-gray-800 text-sm">
-                  📍 Байршил: {r.location || "—"}
+                  📍 Байршил: {resort.location || "—"}
                 </div>
               </div>
             </div>
 
             <div className="flex flex-col gap-2">
               <Link
-                to={`/resorts/edit/${r._id}`}
+                to={`/resorts/edit/${resort._id}`}
                 className="px-2 py-1 border rounded text-sm hover:bg-gray-50"
               >
                 ✏️ Edit
               </Link>
               <button
-                onClick={() => removeResort(r._id)}
+                onClick={() => removeResort(resort._id)}
                 className="px-2 py-1 border rounded text-sm text-red-600 hover:bg-red-50"
               >
                 🗑 Delete
