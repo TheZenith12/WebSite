@@ -17,6 +17,7 @@ const resortSchema = new mongoose.Schema(
     },
 
     phone: {
+      type: String,
       type: Number
 
     },
